@@ -10,14 +10,16 @@ namespace uvlib {
 using command_list_t = std::list<std::list<Command>>;
 using subsystem_list_t = std::list<Subsystem>;
 
+/**
+ * NOTE: This class should not be manually instantiated. Instead,
+ * use the get_scheduler() method as defined below.
+ */
 class Scheduler {
  private:
   command_list_t scheduled_commands;
   subsystem_list_t registered_subsystems;
 
  public:
-  Scheduler();
-
   void initialize();
 
   /**
@@ -45,4 +47,10 @@ class Scheduler {
 
   const subsystem_list_t &get_subsystems();
 };
+
+/**
+ * Always use this method instead of instantiating
+ * a new Scheduler object.
+ */
+const Scheduler &get_scheduler();
 }  // namespace uvlib

@@ -6,15 +6,6 @@ namespace uvlib {
 /* Ensure Scheduler singleton status */
 bool scheduler_created = false;
 
-/* Constructors */
-
-Scheduler::Scheduler() {
-  if (scheduler_created) {
-    throw std::runtime_error("Scheduler instance already created");
-  }
-  scheduler_created = true;
-}
-
 /* Other Methods */
 
 void Scheduler::initialize() {
