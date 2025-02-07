@@ -5,6 +5,22 @@
 namespace uvlib {
 class Subsystem {
  private:
+  int subsystem_id;  // [0, 64] --> Restricted by the bitset size in
+                     // scheduler.hpp
+
+ protected:
+  /**
+   * Internal automatic method. Is called automatically in the
+   * Subsystem's default constructor.
+   * Will register the calling subsystem to the scheduler.
+   *
+   * Ensure a Scheduler has been initialized before this
+   * function is called.
+   *
+   * Sets subsystem_id to a valid value.
+   */
+  void register_self();
+
  public:
   Subsystem();
 
