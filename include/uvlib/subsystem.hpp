@@ -1,7 +1,6 @@
 #pragma once
 
-class Subsystem
-{
-private:
-public:
+class Subsystem {
+ private:
+ public:
 };
