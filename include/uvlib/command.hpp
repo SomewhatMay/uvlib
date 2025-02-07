@@ -5,6 +5,8 @@ namespace uvlib {
 class Command {
  private:
  public:
+  Command();
+
   virtual void initialize();
 
   virtual void execute();
