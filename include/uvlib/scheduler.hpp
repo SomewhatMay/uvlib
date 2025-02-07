@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include <list>
 #include <stack>
 
@@ -7,8 +8,9 @@
 #include "uvlib/subsystem.hpp"
 
 namespace uvlib {
-using command_list_t = std::list<std::list<Command>>;
-using subsystem_list_t = std::list<Subsystem>;
+using command_chain_t = std::list<Command *>;
+using command_list_t = std::list<command_chain_t>;
+using subsystem_list_t = std::list<Subsystem *>;
 
 /**
  * NOTE: This class should not be manually instantiated. Instead,
@@ -18,6 +20,9 @@ class Scheduler {
  private:
   command_list_t scheduled_commands;
   subsystem_list_t registered_subsystems;
+  std::bitset<64> subsystems_used;
+
+  void Scheduler::mainloop_tasks();
 
  public:
   void initialize();
@@ -33,23 +38,28 @@ class Scheduler {
    * Internal method only: to be used by the subsystem superclass
    * automatically.
    */
-  void register_subsystem(Subsystem subsystem);
+  subsystem_list_t::iterator register_subsystem(Subsystem subsystem);
 
   /**
    * Internal method only: to be used by the command superclass
    * automatically.
    */
-  void schedule_command(Command command);
+  command_chain_t::iterator schedule_command(Command command);
+
+  void cancel_command(command_chain_t::iterator command_iterator);
 
   void schedule_command(Command parent_command, Command child_command);
 
-  const command_list_t &get_scheduled_commands();
+  const command_list_t &get_scheduled_commands() const;
 
   const subsystem_list_t &get_subsystems();
 };
 
 /**
- * Always use this method instead of instantiating
+ * Returns the active scheduler. Creates a new
+ * scheduler the first time it is called.
+ *
+ * NOTE: Always use this method instead of instantiating
  * a new Scheduler object.
  */
 const Scheduler &get_scheduler();
