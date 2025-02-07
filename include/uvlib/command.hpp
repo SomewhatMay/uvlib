@@ -1,10 +1,12 @@
 #pragma once
 
-namespace uvlib {
+namespace uvlib
+{
 
-class Command {
-   private:
-   public:
+  class Command
+  {
+  private:
+  public:
     virtual void initialize();
 
     virtual void execute();
@@ -12,6 +14,6 @@ class Command {
     virtual bool is_finished() = 0;
 
     virtual void end(bool interrupted);
-};
+  };
 
-}  // namespace uvlib
+} // namespace uvlib
