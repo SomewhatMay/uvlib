@@ -8,16 +8,25 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v4
     #- name: configure
     #  run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    
+    - name: install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y python3 python3-pip
+        python3 -m pip install --user pros-cli
+        wget -qO- "https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2" | tar -xj
+        echo "$(pwd)/gcc-arm-none-eabi-10-2020-q4-major/bin" >> $GITHUB_PATH
+        
+    - name: Verify Installations
+      run: |
+        arm-none-eabi-gcc --version
+        pros --version
+
+    - name: Build Project
+      run: pros make
