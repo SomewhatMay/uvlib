@@ -1,12 +1,28 @@
 #pragma once
 
-#include "uvlib/command.hpp"
+#include <memory>
 
 namespace uvlib {
+class Command;
+
 class Subsystem {
  private:
-  int subsystem_id;  // [0, 64] --> Restricted by the bitset size in
-                     // scheduler.hpp
+  /**
+   * Keeps track of whether the subsystem was used
+   * by a command this current periodic tick.
+   *
+   * Although not recommended, this value can be safely
+   * used and updated in the subsystem's periodic()
+   * method. If the value is updated to true, the
+   * default command will not run for that periodic tick.
+   */
+  bool used_current_tick = false;
+
+  /**
+   * The command to be automatically executed if no commands are being executed
+   * at the moment
+   */
+  std::shared_ptr<Command> default_command;
 
  protected:
   /**
@@ -16,17 +32,17 @@ class Subsystem {
    *
    * Ensure a Scheduler has been initialized before this
    * function is called.
-   *
-   * Sets subsystem_id to a valid value.
    */
   void register_self();
 
  public:
   Subsystem();
 
-  void set_default_command(Command command);
+  void set_default_command(std::shared_ptr<Command> command);
 
-  void run(Command command);
+  void get_used_current_tick() const;
+
+  void set_used_current_tick(bool used_current_tick);
 
   virtual void initialize();
 

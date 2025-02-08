@@ -3,6 +3,8 @@
 #include <stdexcept>
 
 #include "main.h"
+#include "uvlib/command.hpp"
+#include "uvlib/subsystem.hpp"
 
 namespace uvlib {
 /* Ensure Scheduler singleton status */
@@ -25,12 +27,6 @@ void Scheduler::initialize() {
 }
 
 void Scheduler::mainloop_tasks() {
-  /* Execute all subsystems */
-
-  for (Subsystem *subsystem : registered_subsystems) {
-    subsystem->periodic();
-  }
-
   /* Execute all commands */
   for (auto command_chain = scheduled_commands.begin();
        command_chain != scheduled_commands.end();) {
@@ -39,7 +35,7 @@ void Scheduler::mainloop_tasks() {
       // chain right after this one
       command_chain = scheduled_commands.erase(command_chain);
     } else {
-      Command *target = command_chain->front();
+      std::shared_ptr<Command> target = command_chain->front();
 
       if (target->is_finished()) {
         target->end(false);
@@ -54,6 +50,11 @@ void Scheduler::mainloop_tasks() {
       }
     }
   }
+
+  /* Execute all subsystems */
+  // for (Subsystem *subsystem : registered_subsystems) {
+  //   subsystem->periodic();
+  // }
 }
 
 void Scheduler::mainloop() {

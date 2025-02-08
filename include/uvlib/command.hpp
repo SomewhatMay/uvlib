@@ -3,9 +3,10 @@
 #include <vector>
 
 #include "uvlib/scheduler.hpp"
-#include "uvlib/subsystem.hpp"
 
 namespace uvlib {
+class Subsystem;
+
 class Command {
  private:
   command_chain_t::iterator command_iterator;

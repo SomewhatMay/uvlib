@@ -2,13 +2,14 @@
 
 #include <bitset>
 #include <list>
+#include <memory>
 #include <stack>
 
-#include "uvlib/command.hpp"
-#include "uvlib/subsystem.hpp"
-
 namespace uvlib {
-using command_chain_t = std::list<Command *>;
+class Subsystem;
+class Command;
+
+using command_chain_t = std::list<std::shared_ptr<Command>>;
 using command_list_t = std::list<command_chain_t>;
 using subsystem_list_t = std::list<Subsystem *>;
 
@@ -20,9 +21,8 @@ class Scheduler {
  private:
   command_list_t scheduled_commands;
   subsystem_list_t registered_subsystems;
-  std::bitset<64> subsystems_used;
 
-  void Scheduler::mainloop_tasks();
+  void mainloop_tasks();
 
  public:
   void initialize();
@@ -38,17 +38,16 @@ class Scheduler {
    * Internal method only: to be used by the subsystem superclass
    * automatically.
    */
-  subsystem_list_t::iterator register_subsystem(Subsystem subsystem);
+  const subsystem_list_t::iterator &register_subsystem(Subsystem *subsystem);
 
   /**
    * Internal method only: to be used by the command superclass
    * automatically.
    */
-  command_chain_t::iterator schedule_command(Command command);
+  const command_list_t::iterator &schedule_command(
+      std::shared_ptr<Command> command);
 
   void cancel_command(command_chain_t::iterator command_iterator);
-
-  void schedule_command(Command parent_command, Command child_command);
 
   const command_list_t &get_scheduled_commands() const;
 
