@@ -30,25 +30,36 @@ class Subsystem {
    * Internal automatic method. Is called automatically in the
    * Subsystem's default constructor.
    * Will register the calling subsystem to the scheduler.
-   *
-   * Ensure a Scheduler has been initialized before this
-   * function is called.
    */
   void register_self();
 
  public:
+  /**
+   * Automatically registers this subsystem to the
+   * scheduler with the active register_self() method.
+   */
   Subsystem();
-
-  void set_default_command(std::shared_ptr<Command> command);
-
-  const std::shared_ptr<Command>& get_default_command() const;
-
-  bool get_used_current_tick() const;
-
-  void set_used_current_tick(bool used_current_tick);
 
   virtual void initialize();
 
   virtual void periodic();
+
+  /* Getters and Setters */
+
+  void set_default_command(std::shared_ptr<Command> command);
+
+  /**
+   * In-place construction and assignment of command.
+   * The preferred way to use this method.
+   */
+  template <typename T, typename... Args>
+  std::enable_if_t<std::is_base_of_v<Command, T>, std::shared_ptr<T>>
+  set_default_command(Args&&... constructor_args);
+
+  std::shared_ptr<Command>& get_default_command();
+
+  bool get_used_current_tick() const;
+
+  void set_used_current_tick(bool used_current_tick);
 };
 }  // namespace uvlib
