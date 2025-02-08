@@ -9,7 +9,6 @@ class Subsystem;
 
 class Command {
  private:
-  command_chain_t::iterator command_iterator;
   std::list<Subsystem*> requirements;
 
   /**
@@ -58,26 +57,14 @@ class Command {
   virtual void end(bool interrupted);
 
   /**
-   * Cancels the current command.
-   *
-   * WARNING: This command should NEVER be called within
-   * it's execute() method. Ex. If you have a command
-   * called Drive, you should NEVER call Drive.cancel()
-   * in Drive's execute() function.
+   * Cancels the command by setting it as not alive
+   * so it is not executed in future ticks (unless
+   * rescheduled) and is also removed from the
+   * command_chain in the next tick.
    */
   void cancel();
 
   /* Getters and Setters */
-
-  /**
-   * Internal method.
-   */
-  void set_command_iterator(const command_chain_t::iterator& command_iterator);
-
-  /**
-   * Internal method.
-   */
-  const command_chain_t::iterator& get_command_iterator() const;
 
   const std::list<Subsystem*>& get_requirements() const;
 

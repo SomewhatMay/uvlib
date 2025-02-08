@@ -38,7 +38,7 @@ class Scheduler {
    * Internal method only: to be used by the subsystem superclass
    * automatically.
    */
-  const subsystem_list_t::iterator &register_subsystem(Subsystem *subsystem);
+  void register_subsystem(Subsystem *subsystem);
 
   /**
    * Internal method only: to be used by the command superclass
@@ -47,7 +47,12 @@ class Scheduler {
   const command_list_t::iterator &schedule_command(
       std::shared_ptr<Command> command);
 
-  void cancel_command(command_chain_t::iterator command_iterator);
+  /**
+   * Sets the command as not alive so it is not executed
+   * in future ticks (unless rescheduled) and is also removed
+   * from the command_chain in the next tick.
+   */
+  void cancel_command(std::shared_ptr<Command> command);
 
   const command_list_t &get_scheduled_commands() const;
 

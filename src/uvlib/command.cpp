@@ -10,7 +10,7 @@ void Command::execute() {}
 
 void Command::end(bool interrupted) {}
 
-void Command::cancel() { get_scheduler().cancel_command(command_iterator); }
+void Command::cancel() { set_alive(false); }
 
 /* Getters and Setters */
 
@@ -22,15 +22,6 @@ void Command::set_requirements(
 const std::list<Subsystem*>& Command::get_requirements() const {
   return requirements;
 }
-
-void Command::set_command_iterator(
-    const command_chain_t::iterator& command_iterator) {
-  this->command_iterator = command_iterator;
-};
-
-const command_chain_t::iterator& Command::get_command_iterator() const {
-  return command_iterator;
-};
 
 bool Command::get_alive() const { return is_alive; }
 
