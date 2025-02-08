@@ -13,7 +13,7 @@ Scheduler *scheduler = nullptr;
 /* Keep track of the number of ticks */
 int tick_number = 0;
 
-const Scheduler &get_scheduler() {
+Scheduler &get_scheduler() {
   if (scheduler == nullptr) {
     scheduler = new Scheduler();
   }

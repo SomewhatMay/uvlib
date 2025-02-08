@@ -61,5 +61,5 @@ class Scheduler {
  * NOTE: Always use this method instead of instantiating
  * a new Scheduler object.
  */
-const Scheduler &get_scheduler();
+Scheduler &get_scheduler();
 }  // namespace uvlib
