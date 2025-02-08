@@ -12,8 +12,15 @@ class Command {
   command_chain_t::iterator command_iterator;
   std::list<Subsystem*> requirements;
 
+  /**
+   * The last tick at which the command was executed in.
+   * This is helpful to ensure no command is executed more
+   * than once in a single tick.
+   */
+  int tick_number = -1;
+
  protected:
-  void add_requirements(const std::vector<Subsystem>& requirements);
+  void set_requirements(const std::initializer_list<Subsystem>& requirements);
 
  public:
   Command();
@@ -24,7 +31,11 @@ class Command {
 
   void cancel();
 
-  const std::list<Subsystem*>& get_requirements() const;
+  std::list<Subsystem*>& get_requirements() const;
+
+  void set_tick_number(int tick_number);
+
+  int get_tick_number() const;
 
   virtual void initialize();
 

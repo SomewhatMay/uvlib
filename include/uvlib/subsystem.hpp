@@ -12,9 +12,10 @@ class Subsystem {
    * by a command this current periodic tick.
    *
    * Although not recommended, this value can be safely
-   * used and updated in the subsystem's periodic()
-   * method. If the value is updated to true, the
-   * default command will not run for that periodic tick.
+   * used in the subsystem's periodic() method. If a
+   * default_command for the subsystem is present, this value
+   * will *always* yield true in the periodic() method. Updating
+   * this value in the periodic() method does nothing.
    */
   bool used_current_tick = false;
 
@@ -40,7 +41,9 @@ class Subsystem {
 
   void set_default_command(std::shared_ptr<Command> command);
 
-  void get_used_current_tick() const;
+  const std::shared_ptr<Command>& get_default_command() const;
+
+  bool get_used_current_tick() const;
 
   void set_used_current_tick(bool used_current_tick);
 
