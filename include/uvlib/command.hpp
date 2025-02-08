@@ -20,23 +20,9 @@ class Command {
   int tick_number = -1;
 
  protected:
-  void set_requirements(const std::initializer_list<Subsystem>& requirements);
+  void set_requirements(const std::initializer_list<Subsystem*>& requirements);
 
  public:
-  Command();
-
-  void set_command_iterator(const command_chain_t::iterator& command_iterator);
-
-  const command_chain_t::iterator& get_command_iterator() const;
-
-  void cancel();
-
-  std::list<Subsystem*>& get_requirements() const;
-
-  void set_tick_number(int tick_number);
-
-  int get_tick_number() const;
-
   virtual void initialize();
 
   virtual void execute();
@@ -44,6 +30,28 @@ class Command {
   virtual bool is_finished() = 0;
 
   virtual void end(bool interrupted);
+
+  /**
+   * Cancels the current command.
+   *
+   * WARNING: This command should NEVER be called within
+   * it's execute() method. Ex. If you have a command
+   * called Drive, you should NEVER call Drive.cancel()
+   * in Drive's execute() function.
+   */
+  void cancel();
+
+  /* Getters and Setters */
+
+  void set_command_iterator(const command_chain_t::iterator& command_iterator);
+
+  const command_chain_t::iterator& get_command_iterator() const;
+
+  const std::list<Subsystem*>& get_requirements() const;
+
+  void set_tick_number(int tick_number);
+
+  int get_tick_number() const;
 };
 
 }  // namespace uvlib
