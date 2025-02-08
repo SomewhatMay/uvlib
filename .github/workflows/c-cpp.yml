@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "workflows-test" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "workflows-test" ]
 
 jobs:
   build:
@@ -13,8 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: configure
-      run: ./configure
+    #- name: configure
+    #  run: ./configure
     - name: make
       run: make
     - name: make check
