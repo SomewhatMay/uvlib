@@ -2,9 +2,9 @@
 
 #include <memory>
 
-namespace uvlib {
-class Command;
+#include "uvlib/typedefs.hpp"
 
+namespace uvlib {
 class Subsystem {
  private:
   /**

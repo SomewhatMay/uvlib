@@ -1,7 +1,5 @@
 #include "uvlib/command.hpp"
 
-#include "scheduler.hpp"
-
 namespace uvlib {
 
 void Command::initialize() {}

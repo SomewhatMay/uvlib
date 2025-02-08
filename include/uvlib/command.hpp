@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "uvlib/scheduler.hpp"
+#include "uvlib/typedefs.hpp"
 
 namespace uvlib {
 class Subsystem;

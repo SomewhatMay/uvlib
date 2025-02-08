@@ -5,13 +5,9 @@
 #include <memory>
 #include <stack>
 
-namespace uvlib {
-class Subsystem;
-class Command;
+#include "uvlib/typedefs.hpp"
 
-using command_chain_t = std::list<std::shared_ptr<Command>>;
-using command_list_t = std::list<command_chain_t>;
-using subsystem_list_t = std::list<Subsystem *>;
+namespace uvlib {
 
 /**
  * NOTE: This class should not be manually instantiated. Instead,
@@ -44,8 +40,7 @@ class Scheduler {
    * Internal method only: to be used by the command superclass
    * automatically.
    */
-  const command_list_t::iterator &schedule_command(
-      std::shared_ptr<Command> command);
+  void schedule_command(std::shared_ptr<Command> command);
 
   /**
    * Sets the command as not alive so it is not executed
