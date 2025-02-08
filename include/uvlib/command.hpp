@@ -34,7 +34,7 @@ class Command {
    * requires another subsystem that has already been used
    * by another command in the same tick.
    */
-  bool alive = false;
+  bool is_alive = false;
 
  protected:
   void set_requirements(const std::initializer_list<Subsystem*>& requirements);
