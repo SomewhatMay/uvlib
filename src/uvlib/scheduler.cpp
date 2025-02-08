@@ -44,6 +44,29 @@ void Scheduler::initialize() {
   }
 }
 
+void Scheduler::register_subsystem(Subsystem *subsystem) {
+  registered_subsystems.push_back(subsystem);
+}
+
+std::shared_ptr<Command> Scheduler::schedule_command(
+    std::shared_ptr<Command> command) {
+  scheduled_commands.push_back({command});
+  return command;
+}
+
+template <typename Derived_Command, typename... Args>
+constructable_command_t<Derived_Command> Scheduler::schedule_command(
+    Args &&...constructor_args) {
+  std::shared_ptr<Command> command = std::make_shared<Derived_Command>(
+      std::forward<Args>(constructor_args)...);
+  scheduled_commands.push_back({command});
+  return command;
+}
+
+void Scheduler::cancel_command(std::shared_ptr<Command> command) {
+  command->set_alive(false);
+}
+
 void Scheduler::mainloop_tasks() {
   /* Execute all commands */
   for (auto command_chain = scheduled_commands.begin();

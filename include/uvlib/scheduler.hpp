@@ -36,11 +36,11 @@ class Scheduler {
    */
   void register_subsystem(Subsystem *subsystem);
 
-  /**
-   * Internal method only: to be used by the command superclass
-   * automatically.
-   */
-  void schedule_command(std::shared_ptr<Command> command);
+  std::shared_ptr<Command> schedule_command(std::shared_ptr<Command> command);
+
+  template <typename Derived_Command, typename... Args>
+  constructable_command_t<Derived_Command> schedule_command(
+      Args &&...constructor_args);
 
   /**
    * Sets the command as not alive so it is not executed

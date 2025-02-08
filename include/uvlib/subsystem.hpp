@@ -50,11 +50,11 @@ class Subsystem {
 
   /**
    * In-place construction and assignment of command.
-   * The preferred way to use this method.
+   * The most preferred overload of method.
    */
-  template <typename T, typename... Args>
-  std::enable_if_t<std::is_base_of_v<Command, T>, std::shared_ptr<T>>
-  set_default_command(Args&&... constructor_args);
+  template <typename Derived_Command, typename... Args>
+  constructable_command_t<Derived_Command> set_default_command(
+      Args&&... constructor_args);
 
   std::shared_ptr<Command>& get_default_command();
 
