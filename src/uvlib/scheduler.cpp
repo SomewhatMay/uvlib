@@ -55,18 +55,29 @@ void Scheduler::mainloop_tasks() {
     } else {
       std::shared_ptr<Command> target = command_chain->front();
 
-      if (target->is_finished()) {
+      if (target->is_finished() || !target->get_alive()) {
         // Remove this command and rerun the loop on this
         // same chain to potentially run the next command.
-        target->end(false);
-        command_chain->pop_front();
-      } else if (target->get_tick_number() != tick_number) {
-        // Only run the command if it has not already ran yet
-        // (avoids double-execution).
+        if (target->get_alive()) {
+          target->set_alive(false);
+          target->end(false);
+        }
 
+        command_chain->pop_front();
+        // No need to update command chain; we should first
+        // check if the next command in line can be safely
+        // executed since this current one was skipped.
+      } else {
         // Ensure that the command's requirements have
         // not already been used.
-        if (is_runnable_command(target)) {
+        if (is_runnable_command(target) &&
+            target->get_tick_number() != tick_number) {
+          // Only run the command if it has not already ran yet
+          // (avoids double-execution).
+          // This also removes any duplicate commands from the list,
+          // ensuring that only the most recently scheduled version
+          // of the command executes.
+
           // Mark command as executed.
           target->set_tick_number(tick_number);
           target->execute();
@@ -81,6 +92,7 @@ void Scheduler::mainloop_tasks() {
           command_chain++;
         } else {
           // command was interrupted
+          target->set_alive(false);
           target->end(true);
 
           // Remove this command and rerun the loop on this
@@ -95,7 +107,7 @@ void Scheduler::mainloop_tasks() {
     }
   }
 
-  /* Execute all subsystems */
+  /* Execute all subsystems and default commands */
   for (Subsystem *subsystem : registered_subsystems) {
     // Execute the default command of the subsystem if
     // and only if the current subsystem has not been
@@ -105,11 +117,23 @@ void Scheduler::mainloop_tasks() {
           subsystem->get_default_command();
 
       // Ensure the command has not already been executed
-      //  this tick and that all its required subsystems have been untouched
-      if (is_runnable_command(default_command) &&
+      // this tick,  that all its required subsystems
+      // are untouched, and that it is not finished.
+      if (!default_command->is_finished() &&
+          is_runnable_command(default_command) &&
           default_command->get_tick_number() != tick_number) {
+        if (!default_command->get_alive()) {
+          // Command has just reawakened from sleep
+          default_command->initialize();
+        }
+
         default_command->set_tick_number(tick_number);
         default_command->execute();
+      } else if (default_command->get_alive()) {
+        // the command was alive the previous tick but has been
+        // interrupted. We need to call end() to properly clean up
+        default_command->end(true);
+        default_command->set_alive(false);
       }
     }
 
