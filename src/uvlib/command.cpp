@@ -32,6 +32,10 @@ const command_chain_t::iterator& Command::get_command_iterator() const {
   return command_iterator;
 };
 
+bool Command::get_alive() const { return alive; }
+
+void Command::set_alive(bool alive) { this->alive = alive; }
+
 void Command::set_tick_number(int tick_number) {
   this->tick_number = tick_number;
 }

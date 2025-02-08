@@ -81,6 +81,10 @@ class Command {
 
   const std::list<Subsystem*>& get_requirements() const;
 
+  bool get_alive() const;
+
+  void set_alive(bool alive);
+
   /**
    * Internal method.
    */
