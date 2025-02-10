@@ -22,9 +22,8 @@ void Subsystem::set_default_command(std::shared_ptr<Command> command) {
 }
 
 template <typename Derived_Command, typename... Args>
-std::enable_if_t<std::is_base_of_v<Command, Derived_Command>,
-                 std::shared_ptr<Derived_Command>>
-Subsystem::set_default_command(Args&&... constructor_args) {
+constructable_command_t<Derived_Command> Subsystem::set_default_command(
+    Args&&... constructor_args) {
   std::shared_ptr<Derived_Command> command = std::make_shared<Derived_Command>(
       std::forward<Args>(constructor_args)...);
 
