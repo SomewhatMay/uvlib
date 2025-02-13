@@ -40,7 +40,14 @@ class Subsystem {
    * The most preferred overload of method.
    */
   template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> set_default_command(Args&&... constructor_args);
+  cmdptr<DerivedCommand> set_default_command(Args&&... constructor_args) {
+    std::shared_ptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...);
+
+    set_default_command(command);
+
+    return command;
+  }
 
  public:
   /**

@@ -21,17 +21,6 @@ void Subsystem::set_default_command(cmdptr<Command> command) {
   this->default_command = command;
 }
 
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> Subsystem::set_default_command(
-    Args&&... constructor_args) {
-  std::shared_ptr<DerivedCommand> command =
-      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
-
-  set_default_command(command);
-
-  return command;
-}
-
 bool Subsystem::get_used_current_tick() const { return used_current_tick; }
 
 void Subsystem::set_used_current_tick(bool used_current_tick) {
