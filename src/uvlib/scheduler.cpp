@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 #include "main.h"
-#include "uvlib/command.hpp"
+#include "uvlib/commands/command.hpp"
 #include "uvlib/subsystem.hpp"
 
 namespace uvlib {
@@ -48,7 +48,9 @@ void Scheduler::register_subsystem(Subsystem *subsystem) {
   registered_subsystems.push_back(subsystem);
 }
 
-commandptr_t Scheduler::schedule_command(commandptr_t command) {
+template <typename DerivedCommand>
+cmdptr<DerivedCommand> Scheduler::schedule_command(
+    cmdptr<DerivedCommand> command) {
   scheduled_commands.push_back(command);
 
   command->set_alive(true);
@@ -57,15 +59,14 @@ commandptr_t Scheduler::schedule_command(commandptr_t command) {
   return command;
 }
 
-template <typename Derived_Command, typename... Args>
-constructable_command_t<Derived_Command> Scheduler::schedule_command(
-    Args &&...constructor_args) {
-  commandptr_t command = std::make_shared<Derived_Command>(
-      std::forward<Args>(constructor_args)...);
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> Scheduler::schedule_command(Args &&...constructor_args) {
+  commandptr_t command =
+      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
 
-  schedule_command(command);
+  schedule_command<DerivedCommand>(command);
 
-  return std::static_pointer_cast<Derived_Command>(command);
+  return std::static_pointer_cast<DerivedCommand>(command);
 }
 
 void Scheduler::cancel_command(std::shared_ptr<Command> command) {

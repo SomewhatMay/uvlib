@@ -1,4 +1,4 @@
-#include "uvlib/command.hpp"
+#include "uvlib/commands/command.hpp"
 
 #include "uvlib/scheduler.hpp"
 
@@ -22,7 +22,7 @@ void schedule_chained_commands(
 
   if (chained_command) {
     for (auto& new_command : *(*chained_command)) {
-      scheduler.schedule_command(new_command);
+      scheduler.schedule_command<Command>(new_command);
     }
   }
 
@@ -67,12 +67,12 @@ void Command::set_tick_number(int tick_number) {
 
 int Command::get_tick_number() const { return tick_number; }
 
-template <typename Derived_Command, typename... Args>
-constructable_command_t<Derived_Command> mkcmd(Args&&... constructor_args) {
-  cmdptr<Derived_Command> command = std::make_shared<Derived_Command>(
-      std::forward<Args>(constructor_args)...);
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args) {
+  cmdptr<DerivedCommand> command =
+      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
 
-  return std::static_pointer_cast<Derived_Command>(command);
+  return std::static_pointer_cast<DerivedCommand>(command);
 }
 
 }  // namespace uvlib

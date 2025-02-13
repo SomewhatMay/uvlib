@@ -36,11 +36,11 @@ class Scheduler {
    */
   void register_subsystem(Subsystem *subsystem);
 
-  commandptr_t schedule_command(commandptr_t command);
+  template <typename DerivedCommand>
+  cmdptr<DerivedCommand> schedule_command(cmdptr<DerivedCommand> command);
 
-  template <typename Derived_Command, typename... Args>
-  constructable_command_t<Derived_Command> schedule_command(
-      Args &&...constructor_args);
+  template <typename DerivedCommand, typename... Args>
+  cmdptr<DerivedCommand> schedule_command(Args &&...constructor_args);
 
   /**
    * Sets the command as not alive so it is not executed

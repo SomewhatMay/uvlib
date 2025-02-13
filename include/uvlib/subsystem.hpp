@@ -52,9 +52,8 @@ class Subsystem {
    * In-place construction and assignment of command.
    * The most preferred overload of method.
    */
-  template <typename Derived_Command, typename... Args>
-  constructable_command_t<Derived_Command> set_default_command(
-      Args&&... constructor_args);
+  template <typename DerivedCommand, typename... Args>
+  cmdptr<DerivedCommand> set_default_command(Args&&... constructor_args);
 
   std::shared_ptr<Command>& get_default_command();
 

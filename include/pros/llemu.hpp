@@ -51,8 +51,8 @@ namespace lcd {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 namespace {
-template <typename Derived_Command>
-Derived_Command convert_args(Derived_Command arg) {
+template <typename DerivedCommand>
+DerivedCommand convert_args(DerivedCommand arg) {
   return arg;
 }
 const char* convert_args(const std::string& arg) { return arg.c_str(); }

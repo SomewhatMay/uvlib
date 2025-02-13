@@ -21,11 +21,11 @@ void Subsystem::set_default_command(std::shared_ptr<Command> command) {
   this->default_command = command;
 }
 
-template <typename Derived_Command, typename... Args>
-constructable_command_t<Derived_Command> Subsystem::set_default_command(
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> Subsystem::set_default_command(
     Args&&... constructor_args) {
-  std::shared_ptr<Derived_Command> command = std::make_shared<Derived_Command>(
-      std::forward<Args>(constructor_args)...);
+  std::shared_ptr<DerivedCommand> command =
+      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
 
   set_default_command(command);
 

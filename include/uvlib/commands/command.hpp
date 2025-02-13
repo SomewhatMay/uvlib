@@ -92,18 +92,16 @@ class Command {
 
   /* Command Composition */
 
-  commandptr_t and_then(commandptr_t command);
+  /* composition: and_then */
+  template <typename DerivedCommand>
+  cmdptr<DerivedCommand> and_then(cmdptr<DerivedCommand> command);
 
-  template <typename Derived_Command, typename... Args>
-  constructable_command_t<Derived_Command> and_then(Args&&... constructor_args);
+  template <typename DerivedCommand, typename... Args>
+  cmdptr<DerivedCommand> and_then(Args&&... constructor_args);
 
-  commandptr_t race_with(commandptr_t command);
+  /* composition: catch */
 
-  template <typename Derived_Command, typename... Args>
-  constructable_command_t<Derived_Command> race_with(
-      Args&&... constructor_args);
-
-  commandptr_t race_with(std::initializer_list<commandptr_t> command);
+  /* composition: finally */
 
   /* Getters and Setters */
 
@@ -121,6 +119,6 @@ class Command {
   int get_tick_number() const;
 };
 
-template <typename Derived_Command, typename... Args>
-constructable_command_t<Derived_Command> mkcmd(Args&&... constructor_args);
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args);
 }  // namespace uvlib

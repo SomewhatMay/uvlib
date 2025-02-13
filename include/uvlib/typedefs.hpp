@@ -22,16 +22,11 @@ enum ScheduleDirection {
 
 using commandptr_t = std::shared_ptr<Command>;
 
-template <typename Derived_Command>
-using cmdptr = std::enable_if_t<std::is_base_of_v<Command, Derived_Command>,
-                                std::shared_ptr<Derived_Command>>;
+template <typename DerivedCommand>
+using cmdptr = std::enable_if_t<std::is_base_of_v<Command, DerivedCommand>,
+                                std::shared_ptr<DerivedCommand>>;
 
 using command_list_t = std::list<commandptr_t>;
 using subsystem_list_t = std::list<Subsystem *>;
-
-template <typename Derived_Command>
-using constructable_command_t =
-    std::enable_if_t<std::is_base_of_v<Command, Derived_Command>,
-                     std::shared_ptr<Derived_Command>>;
 
 }  // namespace uvlib
