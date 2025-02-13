@@ -18,7 +18,7 @@ void Command::end(bool interrupted) {}
  */
 void schedule_chained_commands(
     std::optional<std::forward_list<commandptr_t>>* chained_command) {
-  Scheduler& scheduler = get_scheduler();
+  Scheduler& scheduler = Scheduler::get_instance();
 
   if (chained_command) {
     for (auto& new_command : *(*chained_command)) {

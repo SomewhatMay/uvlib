@@ -5,15 +5,16 @@
 #include <memory>
 #include <stack>
 
+#include "uvlib/singleton.hpp"
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
 
 /**
- * NOTE: This class should not be manually instantiated. Instead,
- * use the get_scheduler() method as defined below.
+ * WARNING: This class should not be manually instantiated. Instead,
+ * use the Scheduler::get_instance() method instead.
  */
-class Scheduler {
+class Scheduler : public Singleton<Scheduler> {
  private:
   command_list_t scheduled_commands;
   subsystem_list_t registered_subsystems;
@@ -21,6 +22,18 @@ class Scheduler {
   void mainloop_tasks();
 
  public:
+  /**
+   * Use
+   *
+   * static T& Scheduler::get_instance();
+   *
+   * to get the active scheduler. Creates a new
+   * scheduler the first time it is called.
+   *
+   * NOTE: Always use this method instead of instantiating
+   * a new Scheduler object.
+   */
+
   void initialize();
 
   /**
@@ -53,13 +66,4 @@ class Scheduler {
 
   const subsystem_list_t &get_subsystems();
 };
-
-/**
- * Returns the active scheduler. Creates a new
- * scheduler the first time it is called.
- *
- * NOTE: Always use this method instead of instantiating
- * a new Scheduler object.
- */
-Scheduler &get_scheduler();
 }  // namespace uvl

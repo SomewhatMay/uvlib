@@ -3,7 +3,9 @@
 #include "uvlib/scheduler.hpp"
 
 namespace uvl {
-void Subsystem::register_self() { get_scheduler().register_subsystem(this); }
+void Subsystem::register_self() {
+  Scheduler::get_instance().register_subsystem(this);
+}
 
 Subsystem::Subsystem() { register_self(); }
 

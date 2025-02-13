@@ -16,7 +16,7 @@ class Singleton {
   Singleton& operator=(Singleton&&) = delete;
 
   // Provides global access to the singleton instance
-  static T& getInstance() {
+  static T& get_instance() {
     static T instance;
     return instance;
   }
