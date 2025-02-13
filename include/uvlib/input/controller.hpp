@@ -11,17 +11,41 @@ namespace uvl {
  */
 class Controller : public Subsystem {
  private:
-  bool own_controller = false;
+  /**
+   * Determines whether the controller should be
+   * destroyed when this object is destroyed.
+   */
+  bool controller_ownership = false;
+
   pros::Controller* controller;
 
+  std::unordered_map<TriggerButton, Trigger> binded_triggers;
+
+  Joystick m_left_joystick;
+  Joystick m_right_joystick;
+
  public:
-  Controller(pros::Controller& controller) {
-    this->controller = &controller;
-  }
+  explicit Controller(pros::Controller* controller);
 
-  ~Controller() {
-  }
+  explicit Controller(pros::controller_id_e_t id);
 
-  const pros::Controller& get_controller() const;
+  ~Controller();
+
+  void periodic() override;
+
+  Trigger get_trigger(TriggerButton button);
+
+  const Joystick& left_joystick() { return m_left_joystick; }
+
+  const Joystick& right_joystick() { return m_right_joystick; }
+
+  /** Getters and Setters */
+
+  const pros::Controller& get_controller() const { return *controller; };
+
+  const std::unordered_map<TriggerButton, Trigger>& get_binded_triggers()
+      const {
+    return binded_triggers;
+  };
 };
 }  // namespace uvl

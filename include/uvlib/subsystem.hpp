@@ -23,7 +23,7 @@ class Subsystem {
    * The command to be automatically executed if no commands are being executed
    * at the moment
    */
-  std::shared_ptr<Command> default_command;
+  cmdptr<Command> default_command;
 
  protected:
   /**
@@ -32,6 +32,15 @@ class Subsystem {
    * Will register the calling subsystem to the scheduler.
    */
   void register_self();
+
+  void set_default_command(std::shared_ptr<Command> command);
+
+  /**
+   * In-place construction and assignment of command.
+   * The most preferred overload of method.
+   */
+  template <typename DerivedCommand, typename... Args>
+  cmdptr<DerivedCommand> set_default_command(Args&&... constructor_args);
 
  public:
   /**
@@ -46,16 +55,7 @@ class Subsystem {
 
   /* Getters and Setters */
 
-  void set_default_command(std::shared_ptr<Command> command);
-
-  /**
-   * In-place construction and assignment of command.
-   * The most preferred overload of method.
-   */
-  template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> set_default_command(Args&&... constructor_args);
-
-  std::shared_ptr<Command>& get_default_command();
+  cmdptr<Command> get_default_command();
 
   bool get_used_current_tick() const;
 

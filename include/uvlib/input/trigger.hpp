@@ -8,10 +8,10 @@ class Trigger {
  private:
   const pros::Controller* controller;
 
+  TriggerButton button;
+
  public:
-  Trigger(const pros::Controller& controller) {
-    this->controller = &controller;
-  }
+  Trigger(const pros::Controller& controller, TriggerButton button);
 
   /* Trigger Methods */
 

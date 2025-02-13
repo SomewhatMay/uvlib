@@ -1,12 +1,10 @@
 #pragma once
 
-#include <list>
-#include <memory>
-
 namespace uvl {
 
 class Subsystem;
 class Command;
+class Trigger;
 
 /**
  * Determines the order that a command is added
@@ -19,6 +17,23 @@ enum ScheduleDirection {
   kTop = 0,  // DEFAULT
   kBottom = 1
 };
+
+enum TriggerButton {
+  kL1 = pros::E_CONTROLLER_DIGITAL_L1,
+  kL2 = pros::E_CONTROLLER_DIGITAL_L2,
+  kR1 = pros::E_CONTROLLER_DIGITAL_R1,
+  kR2 = pros::E_CONTROLLER_DIGITAL_R2,
+  kUp = pros::E_CONTROLLER_DIGITAL_UP,
+  kDown = pros::E_CONTROLLER_DIGITAL_DOWN,
+  kLeft = pros::E_CONTROLLER_DIGITAL_LEFT,
+  kRight = pros::E_CONTROLLER_DIGITAL_RIGHT,
+  kX = pros::E_CONTROLLER_DIGITAL_X,
+  kB = pros::E_CONTROLLER_DIGITAL_B,
+  kY = pros::E_CONTROLLER_DIGITAL_Y,
+  kA = pros::E_CONTROLLER_DIGITAL_A
+};
+
+enum AnalogStick { kLeft = 0, kRight = 1 };
 
 using commandptr_t = std::shared_ptr<Command>;
 

@@ -15,9 +15,7 @@ void Subsystem::periodic() {}
 
 /* Getters and Setters */
 
-std::shared_ptr<Command>& Subsystem::get_default_command() {
-  return default_command;
-}
+cmdptr<Command> Subsystem::get_default_command() { return default_command; }
 
 void Subsystem::set_default_command(std::shared_ptr<Command> command) {
   this->default_command = command;
