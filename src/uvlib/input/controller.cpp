@@ -7,12 +7,12 @@
 
 namespace uvl {
 
-explicit Controller::Controller(pros::Controller* controller)
+Controller::Controller(pros::Controller* controller)
     : controller(controller),
       m_left_joystick(controller, AnalogStick::kLeft),
       m_right_joystick(controller, AnalogStick::kRight) {}
 
-explicit Controller::Controller(pros::controller_id_e_t id)
+Controller::Controller(pros::controller_id_e_t id)
     : controller(new pros::Controller(id)),
       m_left_joystick(controller, AnalogStick::kLeft),
       m_right_joystick(controller, AnalogStick::kRight) {
@@ -26,7 +26,7 @@ Controller::~Controller() {
 }
 
 Trigger& Controller::get_trigger(TriggerButton button) {
-  auto trigger = binded_triggers.try_emplace(button, this, button);
+  auto trigger = binded_triggers.try_emplace(button, controller, button);
 
   return trigger.first->second;
 }

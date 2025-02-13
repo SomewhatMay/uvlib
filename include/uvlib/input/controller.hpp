@@ -1,6 +1,7 @@
 #pragma once
 
 #include "main.h"
+#include "uvlib/input/joystick.hpp"
 #include "uvlib/subsystem.hpp"
 
 namespace uvl {

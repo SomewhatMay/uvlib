@@ -1,7 +1,7 @@
 #pragma once
 
 #include "main.h"
-#include "typedefs.hpp"
+#include "uvlib/typedefs.hpp"
 
 namespace uvl {
 class Trigger {

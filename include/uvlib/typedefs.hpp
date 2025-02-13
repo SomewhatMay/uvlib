@@ -1,10 +1,17 @@
 #pragma once
 
+#include <forward_list>
+#include <list>
+#include <memory>
+
+#include "main.h"
+
 namespace uvl {
 
 class Subsystem;
 class Command;
 class Trigger;
+class Joystick;
 
 /**
  * Determines the order that a command is added
@@ -13,12 +20,12 @@ class Trigger;
  * from top to bottom; therefore, by default, adding
  * commands to the list behaves like a stack.
  */
-enum ScheduleDirection {
+enum struct ScheduleDirection {
   kTop = 0,  // DEFAULT
   kBottom = 1
 };
 
-enum TriggerButton {
+enum struct TriggerButton {
   kL1 = pros::E_CONTROLLER_DIGITAL_L1,
   kL2 = pros::E_CONTROLLER_DIGITAL_L2,
   kR1 = pros::E_CONTROLLER_DIGITAL_R1,
@@ -33,7 +40,7 @@ enum TriggerButton {
   kA = pros::E_CONTROLLER_DIGITAL_A
 };
 
-enum AnalogStick { kLeft = 0, kRight = 1 };
+enum struct AnalogStick { kLeft = 0, kRight = 1 };
 
 using commandptr_t = std::shared_ptr<Command>;
 

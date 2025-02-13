@@ -6,7 +6,7 @@
 #include "uvlib/scheduler.hpp"
 
 namespace uvl {
-explicit Trigger::Trigger(pros::Controller* controller, TriggerButton button)
+Trigger::Trigger(pros::Controller* controller, TriggerButton button)
     : controller(controller), button(button) {}
 
 /* Execute */

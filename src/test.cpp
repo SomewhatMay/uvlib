@@ -21,4 +21,6 @@ int test() {
   uvl::Controller controller(pros::E_CONTROLLER_MASTER);
   controller.get_trigger(uvl::TriggerButton::kA).on_true(myCommand);
   controller.left_joystick().get_x();
+
+  return 0;
 }

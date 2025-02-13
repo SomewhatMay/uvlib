@@ -4,7 +4,7 @@
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
-explicit Joystick::Joystick(pros::Controller* controller, AnalogStick stick)
+Joystick::Joystick(pros::Controller* controller, AnalogStick stick)
     : controller(controller), stick(stick) {}
 
 int Joystick::get_x() const {
