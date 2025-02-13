@@ -8,7 +8,10 @@ void Command::execute() {}
 
 void Command::end(bool interrupted) {}
 
-void Command::cancel() { set_alive(false); }
+void Command::cancel() {
+  set_alive(false);
+  end(true);
+}
 
 /* Getters and Setters */
 

@@ -10,6 +10,9 @@ class Subsystem;
 class Command {
  private:
   std::list<Subsystem*> requirements;
+  std::list<commandptr_t> on_complete_commands;
+  std::list<commandptr_t> on_interrupted_commands;
+  std::list<commandptr_t> raced_commands;
 
   /**
    * The last tick at which the command was executed in.
