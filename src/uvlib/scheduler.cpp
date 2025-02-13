@@ -70,8 +70,7 @@ constructable_command_t<Derived_Command> Scheduler::schedule_command(
 }
 
 void Scheduler::cancel_command(std::shared_ptr<Command> command) {
-  command->set_alive(false);
-  command->end(true);
+  command->cancel();
 }
 
 void Scheduler::mainloop_tasks() {
@@ -116,7 +115,9 @@ void Scheduler::mainloop_tasks() {
         command_it++;
       } else {
         if (target->get_tick_number() == tick_number) {
-          // Redundantly scheduled command. Do nothing.
+          // Redundantly scheduled command. Do not mark it
+          // as dead it since it may still be executing.
+          // We only need to remove the redundancy in the list.
         } else {
           // Required subsystems were already used
           // in the current tick. Command was interrupted.
@@ -130,69 +131,6 @@ void Scheduler::mainloop_tasks() {
       }
     }
   }
-
-  /*
-  for (auto command_chain = scheduled_commands.begin();
-       command_chain != scheduled_commands.end();) {
-    if (command_chain->empty()) {
-      // Remove chain from list and get the command
-      // chain right after this one
-      command_chain = scheduled_commands.erase(command_chain);
-    } else {
-      std::shared_ptr<Command> target = command_chain->front();
-
-      if (target->is_finished() || !target->get_alive()) {
-        // Remove this command and rerun the loop on this
-        // same chain to potentially run the next command.
-        if (target->get_alive()) {
-          target->set_alive(false);
-          target->end(false);
-        }
-
-        command_chain->pop_front();
-        // No need to update command chain; we should first
-        // check if the next command in line can be safely
-        // executed since this current one was skipped.
-      } else {
-        // Ensure that the command's requirements have
-        // not already been used.
-        if (is_runnable_command(target) &&
-            target->get_tick_number() != tick_number) {
-          // Only run the command if it has not already ran yet
-          // (avoids double-execution).
-          // This also removes any duplicate commands from the list,
-          // ensuring that only the most recently scheduled version
-          // of the command executes.
-
-          // Mark command as executed.
-          target->set_tick_number(tick_number);
-          target->execute();
-
-          // Set all of target's requirements as used for this tick
-          for (auto subsystem : target->get_requirements()) {
-            subsystem->set_used_current_tick(true);
-          }
-
-          // Get the next command chain as this chain's front
-          // has been successfully executed.
-          command_chain++;
-        } else {
-          // command was interrupted
-          target->set_alive(false);
-          target->end(true);
-
-          // Remove this command and rerun the loop on this
-          // same chain to potentially run the next command.
-          command_chain->pop_front();
-
-          // No need to update command chain; we should first
-          // check if the next command in line can be safely
-          // executed since this current one was interrupted.
-        }
-      }
-    }
-  }
-  */
 
   /* Execute all subsystems and default commands */
   for (Subsystem *subsystem : registered_subsystems) {
