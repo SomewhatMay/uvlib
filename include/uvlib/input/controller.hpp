@@ -33,11 +33,20 @@ class Controller : public Subsystem {
 
   void periodic() override;
 
-  Trigger get_trigger(TriggerButton button);
+  Trigger& get_trigger(TriggerButton button);
 
   const Joystick& left_joystick() { return m_left_joystick; }
 
   const Joystick& right_joystick() { return m_right_joystick; }
+
+  /**
+   * To use any native pros::Controller methods, you may
+   * utilize the Controller::get_controller() method.
+   *
+   * Ex:
+   * uvl::Controller master(E_CONTROLLER_MASTER);
+   * master.get_controller().controller_rumble(". - . -");
+   */
 
   /** Getters and Setters */
 

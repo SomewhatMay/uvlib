@@ -25,11 +25,15 @@ Controller::~Controller() {
   }
 }
 
-Trigger Controller::get_trigger(TriggerButton button) {
+Trigger& Controller::get_trigger(TriggerButton button) {
   auto trigger = binded_triggers.try_emplace(button, this, button);
 
   return trigger.first->second;
 }
 
-void Controller::periodic() {}
+void Controller::periodic() {
+  for (auto& [button, trigger] : binded_triggers) {
+    trigger.execute();
+  }
+}
 }  // namespace uvl
