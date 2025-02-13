@@ -24,13 +24,14 @@ USE_PACKAGE:=1
 EXCLUDE_COLD_LIBRARIES:= 
 
 # Set this to 1 to add additional rules to compile your project as a PROS library template
-IS_LIBRARY:=0
+IS_LIBRARY:=1
 # TODO: CHANGE THIS! 
 # Be sure that your header files are in the include directory inside of a folder with the
 # same name as what you set LIBNAME to below.
-LIBNAME:=libbest
-VERSION:=1.0.0
-# EXCLUDE_SRC_FROM_LIB= $(SRCDIR)/unpublishedfile.c
+LIBNAME:=uvlib
+VERSION:=0.1.0
+EXCLUDE_SRC_FROM_LIB= $(SRCDIR)/test.cpp
+EXCLUDE_SRC_FROM_LIB+= $(SRCDIR)/main.cpp
 # this line excludes opcontrol.c and similar files
 EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(file).$(cext)) $(foreach cxxext,$(CXXEXTS),$(file).$(cxxext)))
 
