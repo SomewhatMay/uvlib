@@ -1,5 +1,6 @@
 #pragma once
 
+#include <forward_list>
 #include <optional>
 #include <vector>
 
@@ -12,9 +13,9 @@ class Command {
 
   std::list<Subsystem*> requirements;
 
-  std::optional<std::list<commandptr_t>> and_then_commands;
-  std::optional<std::list<commandptr_t>> catch_commands;
-  std::optional<std::list<commandptr_t>> finally_commands;
+  std::optional<std::forward_list<commandptr_t>> and_then_commands;
+  std::optional<std::forward_list<commandptr_t>> catch_commands;
+  std::optional<std::forward_list<commandptr_t>> finally_commands;
 
   /**
    * The last tick at which the command was executed in.

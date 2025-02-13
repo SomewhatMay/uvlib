@@ -17,7 +17,7 @@ void Command::end(bool interrupted) {}
  * empty state.
  */
 void schedule_chained_commands(
-    std::optional<std::list<commandptr_t>>* chained_command) {
+    std::optional<std::forward_list<commandptr_t>>* chained_command) {
   Scheduler& scheduler = get_scheduler();
 
   if (chained_command) {
@@ -44,6 +44,20 @@ void Command::on_end(bool interrupted) {
 void Command::cancel() {
   set_alive(false);
   on_end(false);
+}
+
+template <typename DerivedCommand>
+cmdptr<DerivedCommand> Command::and_then(cmdptr<DerivedCommand> command) {
+  and_then_commands->push_front(command);
+  return command;
+}
+
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> and_then(Args&&... constructor_args) {
+  cmdptr<DerivedCommand> command =
+      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
+  and_then(command);
+  return command;
 }
 
 /* Getters and Setters */
