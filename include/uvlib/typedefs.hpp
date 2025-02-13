@@ -16,8 +16,8 @@ class Command;
  * commands to the list behaves like a stack.
  */
 enum ScheduleDirection {
-  TOP = 0,  // DEFAULT
-  BOTTOM = 1
+  kTop = 0,  // DEFAULT
+  kBottom = 1
 };
 
 using commandptr_t = std::shared_ptr<Command>;

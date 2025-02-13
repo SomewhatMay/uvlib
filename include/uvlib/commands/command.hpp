@@ -9,7 +9,7 @@
 namespace uvl {
 class Command {
  private:
-  ScheduleDirection scheduleDirection = ScheduleDirection::TOP;
+  ScheduleDirection scheduleDirection = ScheduleDirection::kTop;
 
   std::list<Subsystem*> requirements;
 
@@ -118,6 +118,10 @@ class Command {
   bool get_alive() const;
 
   void set_alive(bool alive);
+
+  ScheduleDirection get_schedule_direction() const;
+
+  void set_schedules_direction(ScheduleDirection direction);
 
   /**
    * Internal method.

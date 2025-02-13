@@ -109,6 +109,14 @@ void Command::set_tick_number(int tick_number) {
   this->tick_number = tick_number;
 }
 
+ScheduleDirection Command::get_schedule_direction() const {
+  return scheduleDirection;
+}
+
+void Command::set_schedules_direction(ScheduleDirection direction) {
+  scheduleDirection = direction;
+}
+
 int Command::get_tick_number() const { return tick_number; }
 
 template <typename DerivedCommand, typename... Args>
