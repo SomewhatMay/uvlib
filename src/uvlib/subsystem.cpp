@@ -17,7 +17,7 @@ void Subsystem::periodic() {}
 
 cmdptr<Command> Subsystem::get_default_command() { return default_command; }
 
-void Subsystem::set_default_command(std::shared_ptr<Command> command) {
+void Subsystem::set_default_command(cmdptr<Command> command) {
   this->default_command = command;
 }
 

@@ -16,6 +16,8 @@ class Joystick {
   int get_x() const;
 
   int get_y() const;
+
+  const pros::Controller& get_controller() const { return *controller; }
 };
 
 }  // namespace uvl

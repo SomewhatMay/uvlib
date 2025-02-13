@@ -48,9 +48,7 @@ void Scheduler::register_subsystem(Subsystem *subsystem) {
   registered_subsystems.push_back(subsystem);
 }
 
-template <typename DerivedCommand>
-cmdptr<DerivedCommand> Scheduler::schedule_command(
-    cmdptr<DerivedCommand> command) {
+commandptr_t Scheduler::schedule_command(commandptr_t command) {
   scheduled_commands.push_back(command);
 
   command->set_alive(true);

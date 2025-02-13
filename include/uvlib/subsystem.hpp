@@ -33,7 +33,7 @@ class Subsystem {
    */
   void register_self();
 
-  void set_default_command(std::shared_ptr<Command> command);
+  void set_default_command(cmdptr<Command> command);
 
   /**
    * In-place construction and assignment of command.

@@ -49,8 +49,7 @@ class Scheduler : public Singleton<Scheduler> {
    */
   void register_subsystem(Subsystem *subsystem);
 
-  template <typename DerivedCommand>
-  cmdptr<DerivedCommand> schedule_command(cmdptr<DerivedCommand> command);
+  commandptr_t schedule_command(commandptr_t command);
 
   template <typename DerivedCommand, typename... Args>
   cmdptr<DerivedCommand> schedule_command(Args &&...constructor_args);

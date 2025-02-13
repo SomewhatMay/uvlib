@@ -42,8 +42,10 @@ void Command::on_end(bool interrupted) {
 }
 
 void Command::cancel() {
-  set_alive(false);
-  on_end(false);
+  if (is_alive) {
+    set_alive(false);
+    on_end(false);
+  }
 }
 
 /* Command Composition */
