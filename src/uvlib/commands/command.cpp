@@ -20,9 +20,9 @@ void schedule_chained_commands(
     std::optional<std::forward_list<commandptr_t>>* chained_command) {
   Scheduler& scheduler = Scheduler::get_instance();
 
-  if (chained_command) {
+  if (*chained_command) {
     for (auto& new_command : *(*chained_command)) {
-      scheduler.schedule_command<Command>(new_command);
+      scheduler.schedule_command(new_command);
     }
   }
 
@@ -56,39 +56,15 @@ cmdptr<Command> Command::and_then(cmdptr<Command> command) {
   return command;
 }
 
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> Command::and_then(Args&&... constructor_args) {
-  cmdptr<DerivedCommand> command =
-      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
-  and_then(command);
-  return command;
-}
-
 /* composition: on_interrupted */
 cmdptr<Command> Command::on_interrupted(cmdptr<Command> command) {
   on_interrupted_commands->push_front(command);
   return command;
 }
 
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> Command::on_interrupted(Args&&... constructor_args) {
-  cmdptr<DerivedCommand> command =
-      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
-  on_interrupted(command);
-  return command;
-}
-
 /* composition: finally */
 cmdptr<Command> Command::finally(cmdptr<Command> command) {
   finally_commands->push_front(command);
-  return command;
-}
-
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> Command::finally(Args&&... constructor_args) {
-  cmdptr<DerivedCommand> command =
-      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
-  finally(command);
   return command;
 }
 
@@ -120,13 +96,5 @@ void Command::set_schedule_direction(ScheduleDirection direction) {
 }
 
 int Command::get_tick_number() const { return tick_number; }
-
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args) {
-  cmdptr<DerivedCommand> command =
-      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
-
-  return std::static_pointer_cast<DerivedCommand>(command);
-}
 
 }  // namespace uvl

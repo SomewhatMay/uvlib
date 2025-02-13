@@ -52,14 +52,21 @@ class Scheduler : public Singleton<Scheduler> {
   commandptr_t schedule_command(commandptr_t command);
 
   template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> schedule_command(Args &&...constructor_args);
+  cmdptr<DerivedCommand> schedule_command(Args &&...constructor_args) {
+    commandptr_t command = std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...);
+
+    schedule_command(command);
+
+    return std::static_pointer_cast<DerivedCommand>(command);
+  }
 
   /**
    * Sets the command as not alive so it is not executed
    * in future ticks (unless rescheduled) and is also removed
    * from the command_list_t in the next tick.
    */
-  void cancel_command(std::shared_ptr<Command> command);
+  void cancel_command(commandptr_t command);
 
   const command_list_t &get_scheduled_commands() const;
 

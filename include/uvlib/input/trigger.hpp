@@ -39,31 +39,46 @@ class Trigger {
   Trigger& on_true(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  Trigger& on_true(Args&&... constructor_args);
+  Trigger& on_true(Args&&... constructor_args) {
+    return on_true(std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...));
+  }
 
   /* trigger: on_false */
   Trigger& on_false(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  Trigger& on_false(Args&&... constructor_args);
+  Trigger& on_false(Args&&... constructor_args) {
+    return on_false(std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...));
+  }
 
   /* trigger: on_change */
   Trigger& on_change(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  Trigger& on_change(Args&&... constructor_args);
+  Trigger& on_change(Args&&... constructor_args) {
+    return on_change(std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...));
+  }
 
   /* trigger: while_true */
   Trigger& while_true(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  Trigger& while_true(Args&&... constructor_args);
+  Trigger& while_true(Args&&... constructor_args) {
+    return while_true(std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...));
+  }
 
   /* trigger: while_false */
   Trigger& while_false(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  Trigger& while_false(Args&&... constructor_args);
+  Trigger& while_false(Args&&... constructor_args) {
+    return while_false(std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...));
+  }
 
   /* Getters and Setters */
 

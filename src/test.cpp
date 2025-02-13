@@ -18,11 +18,13 @@ int test() {
   uvl::cmdptr<MyCommand> myCommand(new MyCommand());
   uvl::cmdptr<MyCommand> secondCommand(new MyCommand());
 
+  uvl::Controller master(pros::E_CONTROLLER_MASTER);
+  uvl::Trigger& L1 = master.get_trigger(uvl::TriggerButton::kL1);
+  L1.on_true<MyCommand>();
+
   myCommand->and_then(secondCommand)->and_then<MyCommand>();
 
-  uvl::Controller controller(pros::E_CONTROLLER_MASTER);
-  controller.get_trigger(uvl::TriggerButton::kA).on_true(myCommand);
-  controller.left_joystick().get_x();
+  uvl::cmdptr<MyCommand> firstCommand = uvl::mkcmd<MyCommand>("Hello,world!");
 
   return 0;
 }

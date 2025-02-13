@@ -97,19 +97,37 @@ class Command {
   cmdptr<Command> and_then(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> and_then(Args&&... constructor_args);
+  cmdptr<DerivedCommand> and_then(Args&&... constructor_args) {
+    static_assert(std::is_base_of_v<Command, DerivedCommand>,
+                  "DerivedCommand must inherit from Command");
+
+    cmdptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...);
+    and_then(command);
+    return command;
+  }
 
   /* composition: on_interrupted */
   cmdptr<Command> on_interrupted(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args);
+  cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args) {
+    cmdptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...);
+    on_interrupted(command);
+    return command;
+  }
 
   /* composition: finally */
   cmdptr<Command> finally(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> finally(Args&&... constructor_args);
+  cmdptr<DerivedCommand> finally(Args&&... constructor_args) {
+    cmdptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
+        std::forward<Args>(constructor_args)...);
+    finally(command);
+    return command;
+  }
 
   /* Getters and Setters */
 
@@ -132,5 +150,8 @@ class Command {
 };
 
 template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args);
+cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args) {
+  return std::make_shared<DerivedCommand>(
+      std::forward<Args>(constructor_args)...);
+}
 }  // namespace uvl

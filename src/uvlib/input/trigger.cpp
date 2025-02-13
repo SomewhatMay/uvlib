@@ -67,39 +67,22 @@ void replace_command(std::optional<commandptr_t>* location,
 
 /* trigger: on_true */
 Trigger& Trigger::on_true(cmdptr<Command> command) {
-  /*
-  cancel ongoing command
-  if (m_on_true) {
-    (*m_on_true)->cancel();
-  }
-
-  m_on_true = command;
-  */
-
   replace_command(&m_on_true, command);
 
   return *this;
 }
 
-template <typename DerivedCommand, typename... Args>
-Trigger& Trigger::on_true(Args&&... constructor_args) {
-  replace_command(&m_on_true, std::make_shared<DerivedCommand>(
-                                  std::forward<Args>(constructor_args)...));
+// template <typename DerivedCommand, typename... Args>
+// Trigger& Trigger::on_true(Args&&... constructor_args) {
+//   replace_command(&m_on_true, std::make_shared<DerivedCommand>(
+//                                   std::forward<Args>(constructor_args)...));
 
-  return *this;
-}
+//   return *this;
+// }
 
 /* trigger: on_false */
 Trigger& Trigger::on_false(cmdptr<Command> command) {
   replace_command(&m_on_false, command);
-
-  return *this;
-}
-
-template <typename DerivedCommand, typename... Args>
-Trigger& Trigger::on_false(Args&&... constructor_args) {
-  replace_command(&m_on_false, std::make_shared<DerivedCommand>(
-                                   std::forward<Args>(constructor_args)...));
 
   return *this;
 }
@@ -111,14 +94,6 @@ Trigger& Trigger::on_change(cmdptr<Command> command) {
   return *this;
 }
 
-template <typename DerivedCommand, typename... Args>
-Trigger& Trigger::on_change(Args&&... constructor_args) {
-  replace_command(&m_on_change, std::make_shared<DerivedCommand>(
-                                    std::forward<Args>(constructor_args)...));
-
-  return *this;
-}
-
 /* trigger: while_true */
 Trigger& Trigger::while_true(cmdptr<Command> command) {
   replace_command(&m_while_true, command);
@@ -126,25 +101,9 @@ Trigger& Trigger::while_true(cmdptr<Command> command) {
   return *this;
 }
 
-template <typename DerivedCommand, typename... Args>
-Trigger& Trigger::while_true(Args&&... constructor_args) {
-  replace_command(&m_while_true, std::make_shared<DerivedCommand>(
-                                     std::forward<Args>(constructor_args)...));
-
-  return *this;
-}
-
 /* trigger: while_false */
 Trigger& Trigger::while_false(cmdptr<Command> command) {
   replace_command(&m_while_false, command);
-
-  return *this;
-}
-
-template <typename DerivedCommand, typename... Args>
-Trigger& Trigger::while_false(Args&&... constructor_args) {
-  replace_command(&while_false, std::make_shared<DerivedCommand>(
-                                    std::forward<Args>(constructor_args)...));
 
   return *this;
 }

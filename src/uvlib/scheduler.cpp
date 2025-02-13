@@ -57,19 +57,7 @@ commandptr_t Scheduler::schedule_command(commandptr_t command) {
   return command;
 }
 
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> Scheduler::schedule_command(Args &&...constructor_args) {
-  commandptr_t command =
-      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
-
-  schedule_command<DerivedCommand>(command);
-
-  return std::static_pointer_cast<DerivedCommand>(command);
-}
-
-void Scheduler::cancel_command(std::shared_ptr<Command> command) {
-  command->cancel();
-}
+void Scheduler::cancel_command(commandptr_t command) { command->cancel(); }
 
 void Scheduler::mainloop_tasks() {
   /* Execute all commands */
