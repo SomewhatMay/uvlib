@@ -121,7 +121,7 @@ class Command {
 
   ScheduleDirection get_schedule_direction() const;
 
-  void set_schedules_direction(ScheduleDirection direction);
+  void set_schedule_direction(ScheduleDirection direction);
 
   /**
    * Internal method.

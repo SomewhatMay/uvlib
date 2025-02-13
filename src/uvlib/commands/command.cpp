@@ -113,7 +113,7 @@ ScheduleDirection Command::get_schedule_direction() const {
   return scheduleDirection;
 }
 
-void Command::set_schedules_direction(ScheduleDirection direction) {
+void Command::set_schedule_direction(ScheduleDirection direction) {
   scheduleDirection = direction;
 }
 
