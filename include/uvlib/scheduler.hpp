@@ -45,7 +45,7 @@ class Scheduler {
   /**
    * Sets the command as not alive so it is not executed
    * in future ticks (unless rescheduled) and is also removed
-   * from the command_chain in the next tick.
+   * from the command_list_t in the next tick.
    */
   void cancel_command(std::shared_ptr<Command> command);
 

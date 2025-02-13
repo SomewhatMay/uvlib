@@ -1,18 +1,19 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "uvlib/typedefs.hpp"
 
 namespace uvlib {
-class Subsystem;
-
 class Command {
  private:
+  ScheduleDirection scheduleDirection = ScheduleDirection::TOP;
+
   std::list<Subsystem*> requirements;
-  std::list<commandptr_t> on_complete_commands;
-  std::list<commandptr_t> on_interrupted_commands;
-  std::list<commandptr_t> raced_commands;
+
+  std::optional<std::list<commandptr_t>> and_then_commands;
+  std::optional<std::list<commandptr_t>> finally_commands;
 
   /**
    * The last tick at which the command was executed in.
@@ -42,6 +43,8 @@ class Command {
   void set_requirements(const std::initializer_list<Subsystem*>& requirements);
 
  public:
+  virtual ~Command() = default;
+
   virtual void initialize();
 
   virtual void execute();

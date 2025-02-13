@@ -50,25 +50,88 @@ void Scheduler::register_subsystem(Subsystem *subsystem) {
 
 std::shared_ptr<Command> Scheduler::schedule_command(
     std::shared_ptr<Command> command) {
-  scheduled_commands.push_back({command});
+  scheduled_commands.push_back(command);
+
+  command->set_alive(true);
+  command->initialize();
+
   return command;
 }
 
 template <typename Derived_Command, typename... Args>
 constructable_command_t<Derived_Command> Scheduler::schedule_command(
     Args &&...constructor_args) {
-  std::shared_ptr<Command> command = std::make_shared<Derived_Command>(
+  commandptr_t command = std::make_shared<Derived_Command>(
       std::forward<Args>(constructor_args)...);
-  scheduled_commands.push_back({command});
-  return command;
+
+  schedule_command(command);
+
+  return std::static_pointer_cast<Derived_Command>(command);
 }
 
 void Scheduler::cancel_command(std::shared_ptr<Command> command) {
   command->set_alive(false);
+  command->end(true);
 }
 
 void Scheduler::mainloop_tasks() {
   /* Execute all commands */
+  for (auto command_it = scheduled_commands.begin();
+       command_it != scheduled_commands.end(); command_it++) {
+    commandptr_t target = *command_it;
+
+    if (!target->get_alive() || target->is_finished()) {
+      if (target->get_alive()) {
+        // The command successfully returned true
+        // for is_finished, and therefore executed without
+        // any interruption.
+        target->set_alive(false);
+        target->end(false);
+      }
+
+      // Remove the current command from the list and
+      // update the iterator with the next item in the
+      // list.
+      command_it = scheduled_commands.erase(command_it);
+    } else {
+      if (is_runnable_command(target) &&
+          target->get_tick_number() != tick_number) {
+        // We only need to run the command if
+        // has not been executed already AND
+        // if all of its requirements are untouched
+        // for the current tick.
+        // Checking for the tick_number also removes
+        // any redundantly scheduled commands.
+
+        // Mark command as executed
+        target->set_tick_number(tick_number);
+        target->execute();
+
+        // Mark all of target's requirements as used for this tick
+        for (auto subsystem : target->get_requirements()) {
+          subsystem->set_used_current_tick(true);
+        }
+
+        // Update iterator with the next command in the list
+        command_it++;
+      } else {
+        if (target->get_tick_number() == tick_number) {
+          // Redundantly scheduled command. Do nothing.
+        } else {
+          // Required subsystems were already used
+          // in the current tick. Command was interrupted.
+          target->set_alive(false);
+          target->end(true);
+        }
+
+        // Remove this command from the list
+        // and update the iterator to the next command.
+        command_it = scheduled_commands.erase(command_it);
+      }
+    }
+  }
+
+  /*
   for (auto command_chain = scheduled_commands.begin();
        command_chain != scheduled_commands.end();) {
     if (command_chain->empty()) {
@@ -129,6 +192,7 @@ void Scheduler::mainloop_tasks() {
       }
     }
   }
+  */
 
   /* Execute all subsystems and default commands */
   for (Subsystem *subsystem : registered_subsystems) {
@@ -140,7 +204,7 @@ void Scheduler::mainloop_tasks() {
           subsystem->get_default_command();
 
       // Ensure the command has not already been executed
-      // this tick,  that all its required subsystems
+      // this tick, that all its required subsystems
       // are untouched, and that it is not finished.
       if (!default_command->is_finished() &&
           is_runnable_command(default_command) &&
