@@ -85,7 +85,7 @@ void Scheduler::mainloop_tasks() {
         // for is_finished, and therefore executed without
         // any interruption.
         target->set_alive(false);
-        target->end(false);
+        target->on_end(false);
       }
 
       // Remove the current command from the list and
@@ -122,7 +122,7 @@ void Scheduler::mainloop_tasks() {
           // Required subsystems were already used
           // in the current tick. Command was interrupted.
           target->set_alive(false);
-          target->end(true);
+          target->on_end(true);
         }
 
         // Remove this command from the list
@@ -157,8 +157,8 @@ void Scheduler::mainloop_tasks() {
       } else if (default_command->get_alive()) {
         // the command was alive the previous tick but has been
         // interrupted. We need to call end() to properly clean up
-        default_command->end(true);
         default_command->set_alive(false);
+        default_command->on_end(true);
       }
     }
 

@@ -13,6 +13,7 @@ class Command {
   std::list<Subsystem*> requirements;
 
   std::optional<std::list<commandptr_t>> and_then_commands;
+  std::optional<std::list<commandptr_t>> catch_commands;
   std::optional<std::list<commandptr_t>> finally_commands;
 
   /**
@@ -60,7 +61,26 @@ class Command {
    */
   virtual bool is_finished() = 0;
 
+  /**
+   * Automatically called when the command is ended by
+   * the on_end(bool) member function.
+   *
+   * WARNING: Users should NEVER call this method directly;
+   * use the Command::cancel() method instead.
+   */
   virtual void end(bool interrupted);
+
+  /**
+   * The method called by the scheduler when a
+   * command is ended. This handles internal
+   * actions that must happen when the command comes
+   * to an end, and will call end(bool) on its own
+   * when possible.
+   *
+   * NOTE: end(bool) is always called before any and_then,
+   * catch, or finally commands are scheduled.
+   */
+  void on_end(bool interrupted);
 
   /**
    * Cancels the command by setting it as not alive
