@@ -35,7 +35,7 @@ void Command::on_end(bool interrupted) {
   if (!interrupted) {
     schedule_chained_commands(&and_then_commands);
   } else {
-    schedule_chained_commands(&catch_commands);
+    schedule_chained_commands(&on_interrupted_commands);
   }
 
   schedule_chained_commands(&finally_commands);
@@ -46,6 +46,9 @@ void Command::cancel() {
   on_end(false);
 }
 
+/* Command Composition */
+
+/* composition: and_then */
 template <typename DerivedCommand>
 cmdptr<DerivedCommand> Command::and_then(cmdptr<DerivedCommand> command) {
   and_then_commands->push_front(command);
@@ -57,6 +60,36 @@ cmdptr<DerivedCommand> and_then(Args&&... constructor_args) {
   cmdptr<DerivedCommand> command =
       std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
   and_then(command);
+  return command;
+}
+
+/* composition: on_interrupted */
+template <typename DerivedCommand>
+cmdptr<DerivedCommand> Command::on_interrupted(cmdptr<DerivedCommand> command) {
+  on_interrupted_commands->push_front(command);
+  return command;
+}
+
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args) {
+  cmdptr<DerivedCommand> command =
+      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
+  on_interrupted(command);
+  return command;
+}
+
+/* composition: finally */
+template <typename DerivedCommand>
+cmdptr<DerivedCommand> Command::finally(cmdptr<DerivedCommand> command) {
+  finally_commands->push_front(command);
+  return command;
+}
+
+template <typename DerivedCommand, typename... Args>
+cmdptr<DerivedCommand> finally(Args&&... constructor_args) {
+  cmdptr<DerivedCommand> command =
+      std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
+  finally(command);
   return command;
 }
 

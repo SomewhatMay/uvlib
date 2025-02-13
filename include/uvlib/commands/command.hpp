@@ -14,7 +14,7 @@ class Command {
   std::list<Subsystem*> requirements;
 
   std::optional<std::forward_list<commandptr_t>> and_then_commands;
-  std::optional<std::forward_list<commandptr_t>> catch_commands;
+  std::optional<std::forward_list<commandptr_t>> on_interrupted_commands;
   std::optional<std::forward_list<commandptr_t>> finally_commands;
 
   /**
@@ -100,9 +100,19 @@ class Command {
   template <typename DerivedCommand, typename... Args>
   cmdptr<DerivedCommand> and_then(Args&&... constructor_args);
 
-  /* composition: catch */
+  /* composition: on_interrupted */
+  template <typename DerivedCommand>
+  cmdptr<DerivedCommand> on_interrupted(cmdptr<DerivedCommand> command);
+
+  template <typename DerivedCommand, typename... Args>
+  cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args);
 
   /* composition: finally */
+  template <typename DerivedCommand>
+  cmdptr<DerivedCommand> finally(cmdptr<DerivedCommand> command);
+
+  template <typename DerivedCommand, typename... Args>
+  cmdptr<DerivedCommand> finally(Args&&... constructor_args);
 
   /* Getters and Setters */
 
