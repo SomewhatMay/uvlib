@@ -1,6 +1,8 @@
 #include "main.h"
 #include "uvlib/command_api.hpp"
 #include "uvlib/input_api.hpp"
+#include "uvlib/scheduler.hpp"
+#include "uvlib/subsystem.hpp"
 #include "uvlib/typedefs.hpp"
 
 class MyCommand : public uvl::Command {

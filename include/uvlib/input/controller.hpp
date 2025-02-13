@@ -2,6 +2,7 @@
 
 #include "main.h"
 #include "uvlib/input/joystick.hpp"
+#include "uvlib/input/trigger.hpp"
 #include "uvlib/subsystem.hpp"
 
 namespace uvl {
