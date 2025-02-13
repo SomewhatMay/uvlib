@@ -6,7 +6,7 @@
 #include "uvlib/commands/command.hpp"
 #include "uvlib/subsystem.hpp"
 
-namespace uvlib {
+namespace uvl {
 /* Ensure Scheduler singleton status */
 Scheduler *scheduler = nullptr;
 
@@ -192,4 +192,4 @@ const command_list_t &Scheduler::get_scheduled_commands() const {
 const subsystem_list_t &Scheduler::get_subsystems() {
   return registered_subsystems;
 }
-}  // namespace uvlib
+}  // namespace uvl

@@ -2,7 +2,7 @@
 
 #include "main.h"
 
-namespace uvlib {
+namespace uvl {
 class Controller {
  protected:
   pros::Controller controller;
@@ -12,4 +12,4 @@ class Controller {
 
   pros::Controller get_controller() { return controller; }
 };
-}  // namespace uvlib
+}  // namespace uvl

@@ -2,7 +2,7 @@
 
 #include "uvlib/scheduler.hpp"
 
-namespace uvlib {
+namespace uvl {
 void Subsystem::register_self() { get_scheduler().register_subsystem(this); }
 
 Subsystem::Subsystem() { register_self(); }
@@ -37,4 +37,4 @@ bool Subsystem::get_used_current_tick() const { return used_current_tick; }
 void Subsystem::set_used_current_tick(bool used_current_tick) {
   this->used_current_tick = used_current_tick;
 }
-}  // namespace uvlib
+}  // namespace uvl

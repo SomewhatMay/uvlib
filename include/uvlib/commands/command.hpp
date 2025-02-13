@@ -6,7 +6,7 @@
 
 #include "uvlib/typedefs.hpp"
 
-namespace uvlib {
+namespace uvl {
 class Command {
  private:
   ScheduleDirection scheduleDirection = ScheduleDirection::TOP;
@@ -132,4 +132,4 @@ class Command {
 
 template <typename DerivedCommand, typename... Args>
 cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args);
-}  // namespace uvlib
+}  // namespace uvl

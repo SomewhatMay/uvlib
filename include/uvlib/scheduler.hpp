@@ -7,7 +7,7 @@
 
 #include "uvlib/typedefs.hpp"
 
-namespace uvlib {
+namespace uvl {
 
 /**
  * NOTE: This class should not be manually instantiated. Instead,
@@ -62,4 +62,4 @@ class Scheduler {
  * a new Scheduler object.
  */
 Scheduler &get_scheduler();
-}  // namespace uvlib
+}  // namespace uvl

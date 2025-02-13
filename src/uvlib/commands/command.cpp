@@ -2,7 +2,7 @@
 
 #include "uvlib/scheduler.hpp"
 
-namespace uvlib {
+namespace uvl {
 
 void Command::initialize() {}
 
@@ -122,4 +122,4 @@ cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args) {
   return std::static_pointer_cast<DerivedCommand>(command);
 }
 
-}  // namespace uvlib
+}  // namespace uvl

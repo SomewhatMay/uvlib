@@ -4,7 +4,7 @@
 
 #include "uvlib/typedefs.hpp"
 
-namespace uvlib {
+namespace uvl {
 class Subsystem {
  private:
   /**
@@ -61,4 +61,4 @@ class Subsystem {
 
   void set_used_current_tick(bool used_current_tick);
 };
-}  // namespace uvlib
+}  // namespace uvl

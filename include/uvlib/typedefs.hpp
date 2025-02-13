@@ -3,7 +3,7 @@
 #include <list>
 #include <memory>
 
-namespace uvlib {
+namespace uvl {
 
 class Subsystem;
 class Command;
@@ -29,4 +29,4 @@ using cmdptr = std::enable_if_t<std::is_base_of_v<Command, DerivedCommand>,
 using command_list_t = std::list<commandptr_t>;
 using subsystem_list_t = std::list<Subsystem *>;
 
-}  // namespace uvlib
+}  // namespace uvl
