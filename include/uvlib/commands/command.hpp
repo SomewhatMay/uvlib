@@ -94,22 +94,19 @@ class Command {
   /* Command Composition */
 
   /* composition: and_then */
-  template <typename DerivedCommand>
-  cmdptr<DerivedCommand> and_then(cmdptr<DerivedCommand> command);
+  cmdptr<Command> and_then(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
   cmdptr<DerivedCommand> and_then(Args&&... constructor_args);
 
   /* composition: on_interrupted */
-  template <typename DerivedCommand>
-  cmdptr<DerivedCommand> on_interrupted(cmdptr<DerivedCommand> command);
+  cmdptr<Command> on_interrupted(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
   cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args);
 
   /* composition: finally */
-  template <typename DerivedCommand>
-  cmdptr<DerivedCommand> finally(cmdptr<DerivedCommand> command);
+  cmdptr<Command> finally(cmdptr<Command> command);
 
   template <typename DerivedCommand, typename... Args>
   cmdptr<DerivedCommand> finally(Args&&... constructor_args);

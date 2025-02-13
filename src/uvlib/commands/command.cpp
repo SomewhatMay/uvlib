@@ -49,14 +49,13 @@ void Command::cancel() {
 /* Command Composition */
 
 /* composition: and_then */
-template <typename DerivedCommand>
-cmdptr<DerivedCommand> Command::and_then(cmdptr<DerivedCommand> command) {
+cmdptr<Command> Command::and_then(cmdptr<Command> command) {
   and_then_commands->push_front(command);
   return command;
 }
 
 template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> and_then(Args&&... constructor_args) {
+cmdptr<DerivedCommand> Command::and_then(Args&&... constructor_args) {
   cmdptr<DerivedCommand> command =
       std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
   and_then(command);
@@ -64,14 +63,13 @@ cmdptr<DerivedCommand> and_then(Args&&... constructor_args) {
 }
 
 /* composition: on_interrupted */
-template <typename DerivedCommand>
-cmdptr<DerivedCommand> Command::on_interrupted(cmdptr<DerivedCommand> command) {
+cmdptr<Command> Command::on_interrupted(cmdptr<Command> command) {
   on_interrupted_commands->push_front(command);
   return command;
 }
 
 template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args) {
+cmdptr<DerivedCommand> Command::on_interrupted(Args&&... constructor_args) {
   cmdptr<DerivedCommand> command =
       std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
   on_interrupted(command);
@@ -79,14 +77,13 @@ cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args) {
 }
 
 /* composition: finally */
-template <typename DerivedCommand>
-cmdptr<DerivedCommand> Command::finally(cmdptr<DerivedCommand> command) {
+cmdptr<Command> Command::finally(cmdptr<Command> command) {
   finally_commands->push_front(command);
   return command;
 }
 
 template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> finally(Args&&... constructor_args) {
+cmdptr<DerivedCommand> Command::finally(Args&&... constructor_args) {
   cmdptr<DerivedCommand> command =
       std::make_shared<DerivedCommand>(std::forward<Args>(constructor_args)...);
   finally(command);
