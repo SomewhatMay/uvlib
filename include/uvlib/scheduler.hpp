@@ -36,7 +36,7 @@ class Scheduler {
    */
   void register_subsystem(Subsystem *subsystem);
 
-  std::shared_ptr<Command> schedule_command(std::shared_ptr<Command> command);
+  commandptr_t schedule_command(commandptr_t command);
 
   template <typename Derived_Command, typename... Args>
   constructable_command_t<Derived_Command> schedule_command(
