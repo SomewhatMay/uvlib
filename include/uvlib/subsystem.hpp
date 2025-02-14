@@ -56,6 +56,8 @@ class Subsystem {
    */
   Subsystem();
 
+  virtual ~Subsystem() = default;
+
   virtual void initialize();
 
   virtual void periodic();

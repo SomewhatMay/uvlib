@@ -51,4 +51,6 @@ using cmdptr = std::enable_if_t<std::is_base_of_v<Command, DerivedCommand>,
 using command_list_t = std::list<commandptr_t>;
 using subsystem_list_t = std::list<Subsystem *>;
 
+using initializer_subsystems_t = std::initializer_list<Subsystem *>;
+
 }  // namespace uvl

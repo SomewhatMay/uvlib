@@ -42,7 +42,7 @@ class Command {
   bool is_alive = false;
 
  protected:
-  void set_requirements(const std::initializer_list<Subsystem*>& requirements);
+  void set_requirements(const initializer_subsystems_t& requirements);
 
  public:
   virtual ~Command() = default;

@@ -1,6 +1,7 @@
 #include "uvlib/commands/command.hpp"
 
 #include "uvlib/scheduler.hpp"
+#include "uvlib/typedefs.hpp"
 
 namespace uvl {
 
@@ -70,8 +71,7 @@ cmdptr<Command> Command::finally(cmdptr<Command> command) {
 
 /* Getters and Setters */
 
-void Command::set_requirements(
-    const std::initializer_list<Subsystem*>& subsystems) {
+void Command::set_requirements(const initializer_subsystems_t& subsystems) {
   requirements = subsystems;
 }
 

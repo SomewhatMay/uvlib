@@ -23,22 +23,32 @@ class Scheduler : public Singleton<Scheduler> {
 
  public:
   /**
-   * Use
+   * To get a reference to the active scheduler
+   * in the current environment, use the following
+   * command:
    *
    * static T& Scheduler::get_instance();
    *
-   * to get the active scheduler. Creates a new
-   * scheduler the first time it is called.
+   * This command creates a new scheduler the first
+   * time it is called.
    *
    * NOTE: Always use this method instead of instantiating
    * a new Scheduler object.
    */
 
+  /**
+   * Calls initialize on all registered subsystems.
+   * Call this method after you have registered
+   * every subsystem.
+   *
+   * NOTE: Registering any subsystems after calling
+   * the method below will leave them uninitialized.
+   */
   void initialize();
 
   /**
    * Does not run on a separate task. If mainloop is
-   * called in a separate task, ensure that all accessed
+   * called in a separate task, ensure that critical
    * variables are atomic.
    */
   void mainloop();
