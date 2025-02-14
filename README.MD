@@ -18,6 +18,7 @@ Installing is as simple as 1, 2, and 3:
 pros c add-depot uvlib https://raw.githubusercontent.com/SomewhatMay/uvlib/refs/heads/depot/stable.json # adds the remote depot
 pros c apply uvlib # installs uvlib into your current project
 ```
+3. Start coding!
 
 ### ⬇️ Manual installation (not recommended)
 1. Download the [latest release from GitHub releases](https://github.com/SomewhatMay/uvlib/releases)
@@ -43,4 +44,4 @@ pros c uninstall uvlib
 This project is licensed under the Apache-2.0 license. See [LICENSE](LICENSE) for further details.
 
 ## 🔥 Inspiration
-Much of this project was inspired by [WPILib](https://docs.wpilib.org/en/stable/index.html) and its Command-Based programming structure. WPILib is the library trusted by hundreds of FIRST Robotics Teams worldwide. Many of the design decisions were made to align with WPILib's Command-Based Programming structure. You can learn more about the paradigm [here](https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html).
+Much of this project was inspired by [WPILib](https://docs.wpilib.org/en/stable/index.html) and its Command-Based Programming structure. WPILib is the library trusted by hundreds of FIRST Robotics teams worldwide. Many of the design decisions were made to align with WPILib's implementation. You can learn more about the paradigm [here](https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html).
