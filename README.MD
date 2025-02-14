@@ -12,6 +12,7 @@ Installing is as simple as 1, 2, and 3:
 pros c add-depot uvlib https://raw.githubusercontent.com/SomewhatMay/uvlib/refs/heads/depot/stable.json # add the remote depot
 pros c apply uvlib # install uvlib as a template
 ```
+3. Start coding!
 
 ### ⬇️ Manual installation (not recommended)
 1. Download the [latest release from GitHub releases](https://github.com/SomewhatMay/uvlib/releases)
