@@ -13,9 +13,8 @@ void Command::end(bool interrupted) {}
 
 /**
  * Checks if a specific command chain exists,
- * and if it does, schedules every command in it,
- * concluding by resetting the command chain to an
- * empty state.
+ * and if it does, schedules every command in it.
+ * It does not reset the chain!
  */
 void schedule_chained_commands(
     std::optional<std::forward_list<commandptr_t>>* chained_command) {
@@ -27,7 +26,7 @@ void schedule_chained_commands(
     }
   }
 
-  chained_command->reset();
+  // chained_command->reset();
 }
 
 void Command::on_end(bool interrupted) {
@@ -71,7 +70,7 @@ cmdptr<Command> Command::finally(cmdptr<Command> command) {
 
 /* Getters and Setters */
 
-void Command::set_requirements(const initializer_subsystems_t& subsystems) {
+void Command::set_requirements(const init_subsystems_t& subsystems) {
   requirements = subsystems;
 }
 

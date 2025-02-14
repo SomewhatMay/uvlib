@@ -10,15 +10,13 @@ namespace uvl {
  * Executes the required action the next tick
  * by the scheduler.
  */
-class InstantCommand : public Command {
+class ConditionalCommand : public Command {
  private:
-  bool executed = false;
-
-  const std::function<void()>& instant_action;
+  const std::function<void()>& condition_lambda;
 
  public:
-  InstantCommand(const std::function<void()>& instant_action,
-                 const init_subsystems_t& requirements);
+  ConditionalCommand(const std::function<bool()>& condition_lambda,
+                     const init_subsystems_t& requirements);
 
   void execute() override;
 

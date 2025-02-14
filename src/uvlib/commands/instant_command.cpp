@@ -2,7 +2,7 @@
 
 namespace uvl {
 InstantCommand::InstantCommand(const std::function<void()>& instant_action,
-                               const initializer_subsystems_t& requirements)
+                               const init_subsystems_t& requirements)
     : instant_action(instant_action) {
   set_requirements(requirements);
 }
