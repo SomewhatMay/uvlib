@@ -72,10 +72,15 @@ bool Scheduler::schedule_command(Command *command) {
 }
 
 bool Scheduler::schedule_command(CommandPtr &&command) {
-  if (schedule_command(command.get())) {
+  Command *raw_ptr = command.get();
+  if (schedule_command(raw_ptr)) {
     // Only accept ownership if the command was successfully scheduled
-    m_owned_commands[command.get()] = std::move(command);
+    m_owned_commands.insert({raw_ptr, std::move(command)});
+
+    return true;
   }
+
+  return false;
 }
 
 void Scheduler::cancel_command(Command *command) {
