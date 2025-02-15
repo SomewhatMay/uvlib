@@ -1,10 +1,12 @@
 #pragma once
 
 #include <bitset>
+#include <concepts>
 #include <list>
 #include <memory>
 #include <stack>
 
+#include "uvlib/commands/commandptr.hpp"
 #include "uvlib/singleton.hpp"
 #include "uvlib/typedefs.hpp"
 
@@ -15,12 +17,6 @@ namespace uvl {
  * use the Scheduler::get_instance() method instead.
  */
 class Scheduler : public Singleton<Scheduler> {
- private:
-  command_list_t scheduled_commands;
-  subsystem_list_t registered_subsystems;
-
-  void mainloop_tasks();
-
  public:
   /**
    * To get a reference to the active scheduler
@@ -59,27 +55,30 @@ class Scheduler : public Singleton<Scheduler> {
    */
   void register_subsystem(Subsystem *subsystem);
 
-  commandptr_t schedule_command(commandptr_t command);
+  template <typename T>
+  void schedule_command(T &&command) {
+    static_assert(std::is_same_v<std::decay_t<T>, CommandPtr>,
+                  "T must be CommandPtr");
 
-  template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> schedule_command(Args &&...constructor_args) {
-    commandptr_t command = std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...);
+    command->m_is_alive = true;
+    command->initialize();
 
-    schedule_command(command);
-
-    return std::static_pointer_cast<DerivedCommand>(command);
+    // invalidates command, therefore must happen last
+    scheduled_commands.push_back(std::forward<T>(command));
   }
 
-  /**
-   * Sets the command as not alive so it is not executed
-   * in future ticks (unless rescheduled) and is also removed
-   * from the command_list_t in the next tick.
-   */
-  void cancel_command(commandptr_t command);
+  void cancel_command(CommandPtr command);
 
-  const command_list_t &get_scheduled_commands() const;
+  void cancel_command(Command *command);
 
-  const subsystem_list_t &get_subsystems();
+  const std::list<CommandPtr> &get_scheduled_commands() const;
+
+  const std::list<Subsystem *> &get_subsystems();
+
+ private:
+  std::list<CommandPtr> scheduled_commands;
+  std::list<Subsystem *> registered_subsystems;
+
+  void mainloop_tasks();
 };
 }  // namespace uvl
