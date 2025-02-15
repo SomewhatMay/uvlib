@@ -18,6 +18,9 @@ class CommandPtr {
 
   explicit CommandPtr(std::nullptr_t) = delete;
 
+  CommandPtr(CommandPtr&) = delete;
+  CommandPtr& operator=(CommandPtr&) = delete;
+
   CommandPtr(CommandPtr&&);
   CommandPtr& operator=(CommandPtr&&) = default;
 

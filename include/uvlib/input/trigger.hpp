@@ -3,21 +3,10 @@
 #include "main.h"
 #include "uvlib/typedefs.hpp"
 
+#include "uvlib/commands/commandptr.hpp"
+
 namespace uvl {
 class Trigger {
- private:
-  pros::Controller* controller;
-
-  TriggerButton button;
-
-  bool previous_state = false;
-
-  std::optional<commandptr_t> m_on_true;
-  std::optional<commandptr_t> m_on_false;
-  std::optional<commandptr_t> m_on_change;
-  std::optional<commandptr_t> m_while_true;
-  std::optional<commandptr_t> m_while_false;
-
  public:
   explicit Trigger(pros::Controller*, TriggerButton button);
 
@@ -35,53 +24,29 @@ class Trigger {
 
   /* Trigger Methods */
 
-  /* trigger: on_true */
-  Trigger& on_true(cmdptr<Command> command);
+  Trigger& on_true(CommandPtr&& command);
 
-  template <typename DerivedCommand, typename... Args>
-  Trigger& on_true(Args&&... constructor_args) {
-    return on_true(std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...));
-  }
+  Trigger& on_false(CommandPtr&& command);
 
-  /* trigger: on_false */
-  Trigger& on_false(cmdptr<Command> command);
+  Trigger& on_change(CommandPtr&& command);
 
-  template <typename DerivedCommand, typename... Args>
-  Trigger& on_false(Args&&... constructor_args) {
-    return on_false(std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...));
-  }
+  Trigger& while_true(CommandPtr&& command);
 
-  /* trigger: on_change */
-  Trigger& on_change(cmdptr<Command> command);
-
-  template <typename DerivedCommand, typename... Args>
-  Trigger& on_change(Args&&... constructor_args) {
-    return on_change(std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...));
-  }
-
-  /* trigger: while_true */
-  Trigger& while_true(cmdptr<Command> command);
-
-  template <typename DerivedCommand, typename... Args>
-  Trigger& while_true(Args&&... constructor_args) {
-    return while_true(std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...));
-  }
-
-  /* trigger: while_false */
-  Trigger& while_false(cmdptr<Command> command);
-
-  template <typename DerivedCommand, typename... Args>
-  Trigger& while_false(Args&&... constructor_args) {
-    return while_false(std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...));
-  }
-
-  /* Getters and Setters */
+  Trigger& while_false(CommandPtr&& command);
 
   const pros::Controller& get_controller() const { return *controller; }
+
+ private:
+  pros::Controller* controller;
+
+  TriggerButton button;
+
+  bool previous_state = false;
+
+  std::optional<CommandPtr> m_on_true;
+  std::optional<CommandPtr> m_on_false;
+  std::optional<CommandPtr> m_on_change;
+  std::optional<CommandPtr> m_while_true;
+  std::optional<CommandPtr> m_while_false;
 };
 }  // namespace uvl

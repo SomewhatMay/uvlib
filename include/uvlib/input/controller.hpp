@@ -1,6 +1,7 @@
 #pragma once
 
 #include "main.h"
+#include "uvlib/enums.hpp"
 #include "uvlib/input/joystick.hpp"
 #include "uvlib/input/trigger.hpp"
 #include "uvlib/subsystem.hpp"

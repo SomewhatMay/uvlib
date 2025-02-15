@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "uvlib/commands/command.hpp"
+#include "uvlib/enums.hpp"
 #include "uvlib/scheduler.hpp"
 
 namespace uvl {
@@ -20,33 +21,33 @@ void Trigger::execute() {
 
   /* trigger: on_true */
   if (m_on_true && current_state && !previous_state) {
-    Scheduler::get_instance().schedule_command(*m_on_true);
+    Scheduler::get_instance().schedule_command(std::move(*m_on_true));
   }
 
   /* trigger: on_false */
   if (m_on_false && !current_state && previous_state) {
-    Scheduler::get_instance().schedule_command(*m_on_false);
+    Scheduler::get_instance().schedule_command(std::move(*m_on_false));
   }
 
   /* trigger: on_change */
   if (m_on_change && current_state != previous_state) {
-    Scheduler::get_instance().schedule_command(*m_on_change);
+    Scheduler::get_instance().schedule_command(std::move(*m_on_change));
   }
 
   /* trigger: while_true */
   if (m_while_true) {
-    if (current_state && !(*m_while_true)->get_alive()) {
-      Scheduler::get_instance().schedule_command(*m_while_true);
-    } else if (!current_state && (*m_while_true)->get_alive()) {
+    if (current_state && !(*m_while_true)->m_is_alive) {
+      Scheduler::get_instance().schedule_command(std::move(*m_while_true));
+    } else if (!current_state && (*m_while_true)->m_is_alive) {
       (*m_while_true)->cancel();
     }
   }
 
   /* trigger: while_false */
   if (m_while_false) {
-    if (!current_state && !(*m_while_false)->get_alive()) {
-      Scheduler::get_instance().schedule_command(*m_while_false);
-    } else if (current_state && (*m_while_false)->get_alive()) {
+    if (!current_state && !(*m_while_false)->m_is_alive) {
+      Scheduler::get_instance().schedule_command(std::move(*m_while_false));
+    } else if (current_state && (*m_while_false)->m_is_alive) {
       (*m_while_false)->cancel();
     }
   }
@@ -56,54 +57,41 @@ void Trigger::execute() {
 
 /* Trigger Methods */
 
-void replace_command(std::optional<commandptr_t>* location,
-                     commandptr_t command) {
+inline void replace_command(std::optional<CommandPtr>* location,
+                            CommandPtr&& command) {
   if (*location) {
     (*(*location))->cancel();
   }
 
-  *location = command;
+  *location = std::move(command);
 }
 
-/* trigger: on_true */
-Trigger& Trigger::on_true(cmdptr<Command> command) {
-  replace_command(&m_on_true, command);
+Trigger& Trigger::on_true(CommandPtr&& command) {
+  replace_command(&m_on_true, std::move(command));
 
   return *this;
 }
 
-// template <typename DerivedCommand, typename... Args>
-// Trigger& Trigger::on_true(Args&&... constructor_args) {
-//   replace_command(&m_on_true, std::make_shared<DerivedCommand>(
-//                                   std::forward<Args>(constructor_args)...));
-
-//   return *this;
-// }
-
-/* trigger: on_false */
-Trigger& Trigger::on_false(cmdptr<Command> command) {
-  replace_command(&m_on_false, command);
+Trigger& Trigger::on_false(CommandPtr&& command) {
+  replace_command(&m_on_false, std::move(command));
 
   return *this;
 }
 
-/* trigger: on_change */
-Trigger& Trigger::on_change(cmdptr<Command> command) {
-  replace_command(&m_on_change, command);
+Trigger& Trigger::on_change(CommandPtr&& command) {
+  replace_command(&m_on_change, std::move(command));
 
   return *this;
 }
 
-/* trigger: while_true */
-Trigger& Trigger::while_true(cmdptr<Command> command) {
-  replace_command(&m_while_true, command);
+Trigger& Trigger::while_true(CommandPtr&& command) {
+  replace_command(&m_while_true, std::move(command));
 
   return *this;
 }
 
-/* trigger: while_false */
-Trigger& Trigger::while_false(cmdptr<Command> command) {
-  replace_command(&m_while_false, command);
+Trigger& Trigger::while_false(CommandPtr&& command) {
+  replace_command(&m_while_false, std::move(command));
 
   return *this;
 }

@@ -1,6 +1,7 @@
 #include "uvlib/input/joystick.hpp"
 
 #include "main.h"
+#include "uvlib/enums.hpp"
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
