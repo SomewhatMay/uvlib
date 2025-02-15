@@ -16,5 +16,6 @@ temp.errors
 *.ini
 .d/
 
-# compiled library
+# compiled/built library
 uvlib@*.zip
+build/

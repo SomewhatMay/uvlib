@@ -30,8 +30,8 @@ IS_LIBRARY:=1
 # same name as what you set LIBNAME to below.
 LIBNAME:=uvlib
 VERSION:=0.2.0
-# EXCLUDE_SRC_FROM_LIB= $(SRCDIR)/test.cpp
-# EXCLUDE_SRC_FROM_LIB+= $(SRCDIR)/main.cpp
+EXCLUDE_SRC_FROM_LIB= $(SRCDIR)/test.cpp
+EXCLUDE_SRC_FROM_LIB+= $(SRCDIR)/main.cpp
 # this line excludes opcontrol.c and similar files
 EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(file).$(cext)) $(foreach cxxext,$(CXXEXTS),$(file).$(cxxext)))
 
