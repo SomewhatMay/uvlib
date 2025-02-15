@@ -1,6 +1,7 @@
 #include "uvlib/scheduler.hpp"
 
 #include <stdexcept>
+#include <unordered_set>
 
 #include "main.h"
 #include "uvlib/commands/command.hpp"
@@ -11,21 +12,6 @@ namespace uvl {
 /* Keep track of the number of ticks */
 int tick_number = 0;
 
-/**
- * Return true if and only if all of command's requirements
- * have not been previously used in the same tick.
- */
-bool is_runnable_command(Command *command) {
-  bool safe = true;
-  std::list<Subsystem *> requirements = command->get_requirements();
-  auto subsystem_it = requirements.begin();
-  while (safe && subsystem_it != requirements.end()) {
-    safe = !((*subsystem_it)->m_used_current_tick);
-    subsystem_it++;
-  }
-  return safe;
-}
-
 /* Other Methods */
 
 void Scheduler::initialize() {
@@ -35,35 +21,88 @@ void Scheduler::initialize() {
 }
 
 void Scheduler::register_subsystem(Subsystem *subsystem) {
+  if (std::find(m_registered_subsystems.begin(), m_registered_subsystems.end(),
+                subsystem) != m_registered_subsystems.end()) {
+    throw std::runtime_error("Subsystem already registered");
+  }
+
   m_registered_subsystems.push_back(subsystem);
 }
 
-void Scheduler::schedule_command(Command *command) {
+bool Scheduler::schedule_command(Command *command) {
+  // Dont schedule the same command twice
+  if (std::find(m_scheduled_commands.begin(), m_scheduled_commands.end(),
+                command) != m_scheduled_commands.end()) {
+    return false;
+  }
+
+  const auto &requirements = command->get_requirements();
+
+  std::unordered_set<Command *> conflicting_cmds;
+  conflicting_cmds.reserve(m_active_subsystems.size() / 2);
+
+  for (auto subsystem : requirements) {
+    auto active_command = m_active_subsystems.find(subsystem);
+    if (active_command != m_active_subsystems.end()) {
+      conflicting_cmds.insert(active_command->second);
+    }
+  }
+
+  for (auto active_command : conflicting_cmds) {
+    // This should also remove this command's requirements
+    // from the m_active_subsystems map
+    cancel_command(active_command);
+  }
+
+  // Mark each requirement as active with the current command
+  for (auto subsystem : requirements) {
+    m_active_subsystems[subsystem] = command;
+  }
+
+  if (command->m_schedule_direction == ScheduleDirection::kTop) {
+    m_scheduled_commands.push_front(command);
+  } else if (command->m_schedule_direction == ScheduleDirection::kBottom) {
+    m_scheduled_commands.push_back(command);
+  }
+
   command->m_is_alive = true;
   command->initialize();
 
-  m_scheduled_commands.push_back(command);
+  return true;
 }
 
-void Scheduler::schedule_command(CommandPtr &&command) {
-  schedule_command(command.get());
-}
-
-void Scheduler::cancel_command(CommandPtr &&command) {
-  if (command->m_is_alive) {
-    command->m_is_alive = false;
-    command->on_end(true);
+bool Scheduler::schedule_command(CommandPtr &&command) {
+  if (schedule_command(command.get())) {
+    // Only accept ownership if the command was successfully scheduled
+    m_owned_commands[command.get()] = std::move(command);
   }
 }
 
 void Scheduler::cancel_command(Command *command) {
   if (command->m_is_alive) {
     command->m_is_alive = false;
+
+    // Remove the requirements from the active subsystems map
+    for (auto subsystem : command->get_requirements()) {
+      m_active_subsystems.erase(subsystem);
+    }
+
+    auto owned_command = m_owned_commands.find(command);
+    if (owned_command != m_owned_commands.end()) {
+      // FIXME ensure this does call the destructor of the CommandPtr
+      m_owned_commands.erase(owned_command);
+    }
+
+    m_scheduled_commands.remove(command);
     command->on_end(true);
   }
 }
 
-void Scheduler::mainloop_tasks() {
+void Scheduler::cancel_command(CommandPtr &&command) {
+  cancel_command(command.get());
+}
+
+void Scheduler::run() {
   /* Execute all commands */
   for (auto command_it = m_scheduled_commands.begin();
        command_it != m_scheduled_commands.end(); command_it++) {
@@ -83,37 +122,20 @@ void Scheduler::mainloop_tasks() {
       // list.
       command_it = m_scheduled_commands.erase(command_it);
     } else {
-      if (is_runnable_command(target) && target->m_tick_number != tick_number) {
+      if (target->m_tick_number != tick_number) {
         // We only need to run the command if
-        // has not been executed already AND
-        // if all of its requirements are untouched
-        // for the current tick.
-        // Checking for the tick_number also removes
-        // any redundantly scheduled commands.
+        // has not been executed already, ensuring
+        // duplicated commands are not executed.
 
         // Mark command as executed
         target->m_tick_number = tick_number;
         target->execute();
 
-        // Mark all of target's requirements as used for this tick
-        for (auto subsystem : target->get_requirements()) {
-          subsystem->m_used_current_tick = true;
-        }
-
         // Update iterator with the next command in the list
         command_it++;
       } else {
-        if (target->m_tick_number == tick_number) {
-          // Redundantly scheduled command. Do not mark it
-          // as dead it since it may still be executing.
-          // We only need to remove the redundancy in the list.
-        } else {
-          // Required subsystems were already used
-          // in the current tick. Command was interrupted.
-          target->m_is_alive = false;
-          target->on_end(true);
-        }
-
+        // Redundantly scheduled command. Do not mark it
+        // as dead it since it may still be executing.
         // Remove this command from the list
         // and update the iterator to the next command.
         command_it = m_scheduled_commands.erase(command_it);
@@ -124,9 +146,9 @@ void Scheduler::mainloop_tasks() {
   /* Execute all subsystems and default commands */
   for (Subsystem *subsystem : m_registered_subsystems) {
     // Execute the default command of the subsystem if
-    // and only if the current subsystem has not been
-    // used already in this tick
-    if (!subsystem->m_used_current_tick) {
+    // and only if no other commands have this subsystem as
+    // a requirement.
+    if (m_active_subsystems.contains(subsystem)) {
       std::optional<CommandPtr> &default_command_container =
           subsystem->m_default_command;
 
@@ -135,11 +157,19 @@ void Scheduler::mainloop_tasks() {
         // Ensure the command has not already been executed
         // this tick, that all its required subsystems
         // are untouched, and that it is not finished.
-        if (!default_command->is_finished() &&
-            is_runnable_command(default_command.get()) &&
+
+        bool is_runnable_command = true;
+        for (auto requirement : default_command->get_requirements()) {
+          is_runnable_command =
+              is_runnable_command && !m_active_subsystems.contains(requirement);
+
+          if (!is_runnable_command) break;
+        }
+
+        if (!default_command->is_finished() && is_runnable_command &&
             default_command->m_tick_number != tick_number) {
           if (!default_command->m_is_alive) {
-            // Command has just reawakened from sleep
+            // Command has just reawakened from being dead in the previous tick
             default_command->initialize();
           }
 
@@ -147,7 +177,7 @@ void Scheduler::mainloop_tasks() {
           default_command->execute();
         } else if (default_command->m_is_alive) {
           // the command was alive the previous tick but has been
-          // interrupted. We need to call end() to properly clean up
+          // interrupted. We need to call on_end() to properly clean up.
           default_command->m_is_alive = false;
           default_command->on_end(true);
         }
@@ -156,17 +186,12 @@ void Scheduler::mainloop_tasks() {
 
     subsystem->periodic();
   }
-
-  /* Update subsystem used value back to false for next tick */
-  for (Subsystem *subsystem : m_registered_subsystems) {
-    subsystem->m_used_current_tick = false;
-  }
 }
 
 void Scheduler::mainloop() {
   uint32_t now = pros::millis();
   while (true) {
-    mainloop_tasks();
+    run();
     pros::c::task_delay_until(&now, 20);
 
     // FIXME watch to ensure no issues arise
@@ -181,7 +206,8 @@ const std::list<Command *> &Scheduler::get_scheduled_commands() const {
   return m_scheduled_commands;
 }
 
-const std::list<CommandPtr> &Scheduler::get_owned_commands() const {
+const std::unordered_map<Command *, CommandPtr> &Scheduler::get_owned_commands()
+    const {
   return m_owned_commands;
 }
 

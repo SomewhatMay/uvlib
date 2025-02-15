@@ -54,18 +54,6 @@ class Subsystem {
 
  private:
   /**
-   * Keeps track of whether the subsystem was used
-   * by a command this current periodic tick.
-   *
-   * Although not recommended, this value can be safely
-   * used in the subsystem's periodic() method. If a
-   * default_command for the subsystem is present, this value
-   * will *always* yield true in the periodic() method. Updating
-   * this value in the periodic() method does nothing.
-   */
-  bool m_used_current_tick = false;
-
-  /**
    * The command to be automatically executed if no commands are being executed
    * at the moment
    */

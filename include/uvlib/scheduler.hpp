@@ -5,6 +5,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <unordered_map>
 
 #include "uvlib/commands/commandptr.hpp"
 #include "uvlib/singleton.hpp"
@@ -57,8 +58,10 @@ class Scheduler : public Singleton<Scheduler> {
   /**
    * Schedule a command to be considered by the
    * scheduler for the next tick.
+   *
+   * @returns true if the command was successfully scheduled.
    */
-  void schedule_command(CommandPtr &&command);
+  bool schedule_command(CommandPtr &&command);
 
   /**
    * Schedule a command to be considered by the
@@ -71,8 +74,10 @@ class Scheduler : public Singleton<Scheduler> {
    *          and should not be called directly.
    *          Overusing of this method directly may
    *          lead to undefined behaviour.
+   *
+   * @returns true if the command was successfully scheduled.
    */
-  void schedule_command(Command *command);
+  bool schedule_command(Command *command);
 
   /**
    * Mark command as dead, preventing it from
@@ -100,7 +105,7 @@ class Scheduler : public Singleton<Scheduler> {
    * will be automatically destroyed by the
    * scheduler when they are no longer alive.
    */
-  const std::list<CommandPtr> &get_owned_commands() const;
+  const std::unordered_map<Command *, CommandPtr> &get_owned_commands() const;
 
   /**
    * Get a list of every subsystem that has been
@@ -108,17 +113,37 @@ class Scheduler : public Singleton<Scheduler> {
    */
   const std::list<Subsystem *> &get_subsystems();
 
+  /**
+   * Get a const reference to the subsystems
+   * that are being used by the scheduled commands.
+   */
+  const std::unordered_map<Subsystem *, Command *> &get_active_subsystems()
+      const;
+
  private:
   std::list<Command *> m_scheduled_commands;
   std::list<Subsystem *> m_registered_subsystems;
+
+  /**
+   * Represents the subsystems that are being used by the
+   * scheduled commands.
+   */
+  std::unordered_map<Subsystem *, Command *> m_active_subsystems;
 
   /**
    * Commands owned by the scheduler. These
    * commands will be automatically destroyed by
    * the scheduler when they are no longer alive.
    */
-  std::list<CommandPtr> m_owned_commands;
+  std::unordered_map<Command *, CommandPtr> m_owned_commands;
 
-  void mainloop_tasks();
+  /**
+   * Runs an iteration ("a tick") of the scheduler, executing all
+   * scheduled commands and registered subsystem periodic methods.
+   *
+   * @note This is an internal method and is automatically called
+   * by the Scheduler::mainloop() method.
+   */
+  void run();
 };
 }  // namespace uvl
