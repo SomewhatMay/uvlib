@@ -11,6 +11,8 @@ class Command {
   friend class Scheduler;
 
  public:
+  Command() = default;
+
   ~Command();
 
   /**
@@ -49,7 +51,7 @@ class Command {
    * WARNING: This method should not assign any values inside
    * any subsystems. Doing so can cause undefined behaviour.
    */
-  virtual bool is_finished() = 0;
+  virtual bool is_finished();
 
   /**
    * Automatically called when the command is ended by

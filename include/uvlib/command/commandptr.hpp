@@ -18,10 +18,11 @@ class CommandPtr {
 
   explicit CommandPtr(std::nullptr_t) = delete;
 
+  CommandPtr(CommandPtr&&);
+  CommandPtr& operator=(CommandPtr&&) = default;
+
   Command* operator*();
   Command* operator->();
-
-  void cancel() const;
 
   Command* get() const&;
 

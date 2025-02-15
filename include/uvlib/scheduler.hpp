@@ -56,7 +56,7 @@ class Scheduler : public Singleton<Scheduler> {
   void register_subsystem(Subsystem *subsystem);
 
   template <typename T>
-  void Scheduler::schedule_command(T &&command) {
+  void schedule_command(T &&command) {
     static_assert(std::is_same_v<std::decay_t<T>, CommandPtr>,
                   "T must be CommandPtr");
 
