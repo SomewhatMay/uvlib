@@ -9,6 +9,7 @@
 namespace uvl {
 class Command {
   friend class Scheduler;
+  friend class Trigger;
 
  public:
   Command() = default;
