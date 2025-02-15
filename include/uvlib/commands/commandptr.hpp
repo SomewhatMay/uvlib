@@ -6,6 +6,12 @@
 #include "uvlib/commands/command.hpp"
 
 namespace uvl {
+/**
+ * Wrap around every command to ensure simple
+ * and effective memory management. uvlib uses
+ * CommandPtr everywhere it can instead of raw
+ * pointers.
+ */
 class CommandPtr {
  public:
   explicit CommandPtr(std::unique_ptr<Command>&& command);
@@ -24,9 +30,16 @@ class CommandPtr {
   CommandPtr(CommandPtr&&);
   CommandPtr& operator=(CommandPtr&&) = default;
 
+  /**
+   * Directly access the internal Command
+   * class by dereferencing this class.
+   */
   Command* operator*();
   Command* operator->();
 
+  /**
+   * Alias to CommandPtr::operator*()
+   */
   Command* get() const&;
 
   /**

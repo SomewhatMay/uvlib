@@ -13,20 +13,6 @@ namespace uvl {
  * Provides interfaces to use the Trigger object.
  */
 class Controller : public Subsystem {
- private:
-  /**
-   * Determines whether the controller should be
-   * destroyed when this object is destroyed.
-   */
-  bool controller_ownership = false;
-
-  pros::Controller* controller;
-
-  std::unordered_map<TriggerButton, Trigger> binded_triggers;
-
-  Joystick m_left_joystick;
-  Joystick m_right_joystick;
-
  public:
   explicit Controller(pros::Controller* controller);
 
@@ -34,12 +20,27 @@ class Controller : public Subsystem {
 
   ~Controller();
 
-  void periodic() override;
-
+  /**
+   * Get a non-copyable, reference to a specific button
+   * on the VEX controller that can be used to bind
+   * commands.
+   */
   Trigger& get_trigger(TriggerButton button);
 
+  /**
+   * A readonly reference to the left joystick of the
+   * VEX controller.
+   *
+   * Can be used to poll for joystick input.
+   */
   const Joystick& left_joystick() { return m_left_joystick; }
 
+  /**
+   * A readonly reference to the right joystick of the
+   * VEX controller.
+   *
+   * Can be used to poll for joystick input.
+   */
   const Joystick& right_joystick() { return m_right_joystick; }
 
   /**
@@ -59,5 +60,21 @@ class Controller : public Subsystem {
       const {
     return binded_triggers;
   };
+
+ private:
+  /**
+   * Determines whether the controller should be
+   * destroyed when this object is destroyed.
+   */
+  bool controller_ownership = false;
+
+  pros::Controller* controller;
+
+  std::unordered_map<TriggerButton, Trigger> binded_triggers;
+
+  Joystick m_left_joystick;
+  Joystick m_right_joystick;
+
+  void periodic() override;
 };
 }  // namespace uvl

@@ -20,13 +20,36 @@ class Subsystem {
 
   const std::optional<CommandPtr>& get_default_command() const;
 
+  /**
+   * An optional default command can be set for
+   * each subsystem that is executed if no other
+   * command utilizes the subsystem for any given
+   * tick.
+   *
+   * The default subsystem is guaranteed to be
+   * ended every time another command that depends
+   * on this subsystem executes.
+   *
+   * It is also guaranteed to be reinitialized every
+   * time this subsystem is free and the default command
+   * was dead in the previous tick.
+   */
   void set_default_command(CommandPtr&& command);
 
  protected:
   virtual ~Subsystem() = default;
 
+  /**
+   * Put any initialization code for the subsystem.
+   * This only runs once, synchronously with other
+   * subsystems.
+   */
   virtual void initialize();
 
+  /**
+   * Called periodically by the Scheduler after
+   * all commands have executed.
+   */
   virtual void periodic();
 
  private:

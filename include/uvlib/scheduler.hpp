@@ -34,11 +34,10 @@ class Scheduler : public Singleton<Scheduler> {
 
   /**
    * Calls initialize on all registered subsystems.
-   * Call this method after you have registered
-   * every subsystem.
    *
-   * NOTE: Registering any subsystems after calling
-   * the method below will leave them uninitialized.
+   * NOTE: Only call this method once you have instantiated
+   * every subsystem. Instantiating any subsystems after
+   * calling this method will leave them uninitialized.
    */
   void initialize();
 
@@ -55,14 +54,36 @@ class Scheduler : public Singleton<Scheduler> {
    */
   void register_subsystem(Subsystem *subsystem);
 
+  /**
+   * Schedule a command to be considered by the
+   * scheduler for the next tick.
+   */
   void schedule_command(CommandPtr &&command);
 
+  /**
+   * Mark command as dead, preventing it from
+   * being executed again in the next tick and
+   * ultimately removed from the execution stack.
+   */
   void cancel_command(CommandPtr &&command);
 
+  /**
+   * @see cancel_command(CommandPtr &&command)
+   */
   void cancel_command(Command *command);
 
+  /**
+   * Get a const reference to the commands
+   * currently scheduled by the scheduler.
+   * Not every scheduled command is guaranteed
+   * to execute.
+   */
   const std::list<CommandPtr> &get_scheduled_commands() const;
 
+  /**
+   * Get a list of every subsystem that has been
+   * successfully registered to the scheduler.
+   */
   const std::list<Subsystem *> &get_subsystems();
 
  private:

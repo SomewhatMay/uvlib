@@ -7,6 +7,10 @@
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
+/**
+ * Any precise set of instructions the robot should
+ * take, given a specific event.
+ */
 class Command {
   friend class Scheduler;
   friend class Trigger;
@@ -34,20 +38,47 @@ class Command {
    */
   void cancel();
 
+  /**
+   * Every command has a set of subsystem requirements.
+   * These subsystems must be free for the command to
+   * execute. This ensures two commands do not try to
+   * change the state of a singular subsystem at the same
+   * time, which may lead to unexpected behaviour.
+   */
   const std::list<Subsystem*>& get_requirements() const;
 
  protected:
+  /**
+   * Appends to the list of subsystem requirements.
+   *
+   * To learn more,
+   * @see Command::get_requirements()
+   */
   void add_requirements(std::initializer_list<Subsystem*>);
 
+  /**
+   * Implement any initialization logic here. Since
+   * commands are reusable and are only instantiated
+   * once, this method can be used to properly initialize
+   * any internal state before Command::execute() is
+   * called.
+   */
   virtual void initialize();
 
+  /**
+   * Periodically executed by the Scheduler at intervals
+   * before any subsystems are updated.
+   */
   virtual void execute();
 
   /**
-   * It is generally a good idea to keep all actions inside
-   * this method to be short and read-only operations. If
-   * the command is finished, it is strongly encouraged to
-   * move the finished logic to end().
+   * Return true if and only if the command has achieved
+   * its goal.
+   *
+   * NOTE: It is generally a good idea to keep all actions
+   * inside this method to be short and read-only operations.
+   * If the command is finished, it is strongly encouraged to
+   * move the end behaviour to Command::end().
    *
    * WARNING: This method should not assign any values inside
    * any subsystems. Doing so can cause undefined behaviour.
@@ -55,6 +86,12 @@ class Command {
   virtual bool is_finished();
 
   /**
+   * Called when a command is either finished (determined
+   * by Command::is_finished()), or when it is interrupted
+   * (Command::cancel() or another resource requires the subsystems).
+   * The interrupted parameter is false if and only if the command
+   * is ended due a true return from Command::is_finished().
+   *
    * Automatically called when the command is ended by
    * the on_end(bool) member function.
    *
@@ -77,7 +114,7 @@ class Command {
   void on_end(bool interrupted);
 
  private:
-  ScheduleDirection m_scheduleDirection = ScheduleDirection::kTop;
+  ScheduleDirection m_schedule_direction = ScheduleDirection::kTop;
 
   std::list<Subsystem*> m_requirements;
 

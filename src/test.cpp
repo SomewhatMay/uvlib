@@ -42,6 +42,10 @@ int test() {
                  return master.left_joystick().get_x();
                }).to_ptr());
 
+  uvl::CommandPtr moveMotor = MoveMotor(motor).to_ptr();
+
+  moveMotor->cancel();
+
   uvl::Scheduler::get_instance().register_subsystem(motor);
 
   uvl::Scheduler::get_instance().schedule_command(MoveMotor(motor).to_ptr());

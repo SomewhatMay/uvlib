@@ -15,6 +15,10 @@ enum struct ScheduleDirection {
   kBottom
 };
 
+/**
+ * Possible input trigger buttons;
+ * analogous to pros digital buttons.
+ */
 enum struct TriggerButton {
   kL1 = pros::E_CONTROLLER_DIGITAL_L1,
   kL2 = pros::E_CONTROLLER_DIGITAL_L2,
@@ -30,5 +34,9 @@ enum struct TriggerButton {
   kA = pros::E_CONTROLLER_DIGITAL_A
 };
 
-enum struct AnalogStick { kLeft = 0, kRight = 1 };
+/**
+ * The two analog sticks in a standard
+ * VEX controller.
+ */
+enum struct AnalogStick { kLeft, kRight };
 }  // namespace uvl
