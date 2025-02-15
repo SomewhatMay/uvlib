@@ -1,10 +1,10 @@
-name: PROS Build
+name: PROS Verify and Build
 
 on:
   push:
-    branches: [ "main", "workflows-test" ]
+    branches: [ "dev", "main", "release" ]
   pull_request:
-    branches: [ "main", "workflows-test" ]
+    branches: [ "dev", "main", "release" ]
   workflow_dispatch:
 
 jobs:
