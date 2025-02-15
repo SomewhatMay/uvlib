@@ -38,7 +38,15 @@ void Scheduler::register_subsystem(Subsystem *subsystem) {
   registered_subsystems.push_back(subsystem);
 }
 
-void Scheduler::cancel_command(CommandPtr command) {
+void Scheduler::schedule_command(CommandPtr &&command) {
+  command->m_is_alive = true;
+  command->initialize();
+
+  // invalidates command, therefore must happen last
+  scheduled_commands.push_back(std::move(command));
+}
+
+void Scheduler::cancel_command(CommandPtr &&command) {
   if (command->m_is_alive) {
     command->m_is_alive = false;
     command->on_end(true);

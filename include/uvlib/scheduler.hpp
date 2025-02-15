@@ -55,19 +55,9 @@ class Scheduler : public Singleton<Scheduler> {
    */
   void register_subsystem(Subsystem *subsystem);
 
-  template <typename T>
-  void schedule_command(T &&command) {
-    static_assert(std::is_same_v<std::decay_t<T>, CommandPtr>,
-                  "T must be CommandPtr");
+  void schedule_command(CommandPtr &&command);
 
-    command->m_is_alive = true;
-    command->initialize();
-
-    // invalidates command, therefore must happen last
-    scheduled_commands.push_back(std::forward<T>(command));
-  }
-
-  void cancel_command(CommandPtr command);
+  void cancel_command(CommandPtr &&command);
 
   void cancel_command(Command *command);
 
