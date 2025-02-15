@@ -1,5 +1,5 @@
 ![Banner](brand/banner.png)
-# ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/SomewhatMay/uvlib/c-cpp.yml?logo=githubactions&logoColor=ffffff&style=for-the-badge) ![GitHub release (latest by date)](https://img.shields.io/github/release/SomewhatMay/uvlib?logo=github&style=for-the-badge) ![License](https://img.shields.io/github/license/SomewhatMay/uvlib?logo=apache&style=for-the-badge) ![GitHub code size](https://img.shields.io/github/languages/code-size/SomewhatMay/uvlib?style=for-the-badge)
+# ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/SomewhatMay/uvlib/pros.yml?logo=githubactions&logoColor=ffffff&style=for-the-badge) ![GitHub release (latest by date)](https://img.shields.io/github/release/SomewhatMay/uvlib?logo=github&style=for-the-badge) ![License](https://img.shields.io/github/license/SomewhatMay/uvlib?logo=apache&style=for-the-badge) ![GitHub code size](https://img.shields.io/github/languages/code-size/SomewhatMay/uvlib?style=for-the-badge)
 
 uvlib is an open-source PROS library that brings the Command-Based Programming paradigm to V5 Robotics in an creative and intuitive way.
 * **Declarative**: You're more than just a programmer; you're a designer and an engineer. Just explain what you want done, let uvlib worry about the how.
