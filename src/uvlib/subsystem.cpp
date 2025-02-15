@@ -13,17 +13,10 @@ void Subsystem::initialize() {}
 
 void Subsystem::periodic() {}
 
-/* Getters and Setters */
-
-cmdptr<Command> Subsystem::get_default_command() { return default_command; }
-
-void Subsystem::set_default_command(cmdptr<Command> command) {
-  this->default_command = command;
+const std::optional<CommandPtr>& Subsystem::get_default_command() const {
+  return m_default_command;
 }
-
-bool Subsystem::get_used_current_tick() const { return used_current_tick; }
-
-void Subsystem::set_used_current_tick(bool used_current_tick) {
-  this->used_current_tick = used_current_tick;
+void Subsystem::set_default_command(CommandPtr&& command) {
+  m_default_command = std::move(command);
 }
 }  // namespace uvl
