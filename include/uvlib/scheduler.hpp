@@ -61,6 +61,20 @@ class Scheduler : public Singleton<Scheduler> {
   void schedule_command(CommandPtr &&command);
 
   /**
+   * Schedule a command to be considered by the
+   * scheduler for the next tick.
+   *
+   * @note Command must not be destroyed until it is
+   *        either interrupted or finished.
+   *
+   * @warning this method is to be used internally,
+   *          and should not be called directly.
+   *          Overusing of this method directly may
+   *          lead to undefined behaviour.
+   */
+  void schedule_command(Command *command);
+
+  /**
    * Mark command as dead, preventing it from
    * being executed again in the next tick and
    * ultimately removed from the execution stack.
@@ -78,7 +92,15 @@ class Scheduler : public Singleton<Scheduler> {
    * Not every scheduled command is guaranteed
    * to execute.
    */
-  const std::list<CommandPtr> &get_scheduled_commands() const;
+  const std::list<Command *> &get_scheduled_commands() const;
+
+  /**
+   * Get a const reference to the commands
+   * owned by the scheduler. These commands
+   * will be automatically destroyed by the
+   * scheduler when they are no longer alive.
+   */
+  const std::list<CommandPtr> &get_owned_commands() const;
 
   /**
    * Get a list of every subsystem that has been
@@ -87,8 +109,15 @@ class Scheduler : public Singleton<Scheduler> {
   const std::list<Subsystem *> &get_subsystems();
 
  private:
-  std::list<CommandPtr> scheduled_commands;
-  std::list<Subsystem *> registered_subsystems;
+  std::list<Command *> m_scheduled_commands;
+  std::list<Subsystem *> m_registered_subsystems;
+
+  /**
+   * Commands owned by the scheduler. These
+   * commands will be automatically destroyed by
+   * the scheduler when they are no longer alive.
+   */
+  std::list<CommandPtr> m_owned_commands;
 
   void mainloop_tasks();
 };

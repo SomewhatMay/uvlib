@@ -29,21 +29,24 @@ bool is_runnable_command(Command *command) {
 /* Other Methods */
 
 void Scheduler::initialize() {
-  for (Subsystem *subsystem : registered_subsystems) {
+  for (Subsystem *subsystem : m_registered_subsystems) {
     subsystem->initialize();
   }
 }
 
 void Scheduler::register_subsystem(Subsystem *subsystem) {
-  registered_subsystems.push_back(subsystem);
+  m_registered_subsystems.push_back(subsystem);
 }
 
-void Scheduler::schedule_command(CommandPtr &&command) {
+void Scheduler::schedule_command(Command *command) {
   command->m_is_alive = true;
   command->initialize();
 
-  // invalidates command, therefore must happen last
-  scheduled_commands.push_back(std::move(command));
+  m_scheduled_commands.push_back(command);
+}
+
+void Scheduler::schedule_command(CommandPtr &&command) {
+  schedule_command(command.get());
 }
 
 void Scheduler::cancel_command(CommandPtr &&command) {
@@ -62,9 +65,9 @@ void Scheduler::cancel_command(Command *command) {
 
 void Scheduler::mainloop_tasks() {
   /* Execute all commands */
-  for (auto command_it = scheduled_commands.begin();
-       command_it != scheduled_commands.end(); command_it++) {
-    CommandPtr &target = *command_it;
+  for (auto command_it = m_scheduled_commands.begin();
+       command_it != m_scheduled_commands.end(); command_it++) {
+    Command *target = *command_it;
 
     if (!target->m_is_alive || target->is_finished()) {
       if (target->m_is_alive) {
@@ -78,10 +81,9 @@ void Scheduler::mainloop_tasks() {
       // Remove the current command from the list and
       // update the iterator with the next item in the
       // list.
-      command_it = scheduled_commands.erase(command_it);
+      command_it = m_scheduled_commands.erase(command_it);
     } else {
-      if (is_runnable_command(target.get()) &&
-          target->m_tick_number != tick_number) {
+      if (is_runnable_command(target) && target->m_tick_number != tick_number) {
         // We only need to run the command if
         // has not been executed already AND
         // if all of its requirements are untouched
@@ -114,13 +116,13 @@ void Scheduler::mainloop_tasks() {
 
         // Remove this command from the list
         // and update the iterator to the next command.
-        command_it = scheduled_commands.erase(command_it);
+        command_it = m_scheduled_commands.erase(command_it);
       }
     }
   }
 
   /* Execute all subsystems and default commands */
-  for (Subsystem *subsystem : registered_subsystems) {
+  for (Subsystem *subsystem : m_registered_subsystems) {
     // Execute the default command of the subsystem if
     // and only if the current subsystem has not been
     // used already in this tick
@@ -156,7 +158,7 @@ void Scheduler::mainloop_tasks() {
   }
 
   /* Update subsystem used value back to false for next tick */
-  for (Subsystem *subsystem : registered_subsystems) {
+  for (Subsystem *subsystem : m_registered_subsystems) {
     subsystem->m_used_current_tick = false;
   }
 }
@@ -175,11 +177,15 @@ void Scheduler::mainloop() {
 
 /* Getters */
 
-const std::list<CommandPtr> &Scheduler::get_scheduled_commands() const {
-  return scheduled_commands;
+const std::list<Command *> &Scheduler::get_scheduled_commands() const {
+  return m_scheduled_commands;
+}
+
+const std::list<CommandPtr> &Scheduler::get_owned_commands() const {
+  return m_owned_commands;
 }
 
 const std::list<Subsystem *> &Scheduler::get_subsystems() {
-  return registered_subsystems;
+  return m_registered_subsystems;
 }
 }  // namespace uvl

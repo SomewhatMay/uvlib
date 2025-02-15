@@ -21,23 +21,23 @@ void Trigger::execute() {
 
   /* trigger: on_true */
   if (m_on_true && current_state && !previous_state) {
-    Scheduler::get_instance().schedule_command(std::move(*m_on_true));
+    Scheduler::get_instance().schedule_command(m_on_true->get());
   }
 
   /* trigger: on_false */
   if (m_on_false && !current_state && previous_state) {
-    Scheduler::get_instance().schedule_command(std::move(*m_on_false));
+    Scheduler::get_instance().schedule_command(m_on_false->get());
   }
 
   /* trigger: on_change */
   if (m_on_change && current_state != previous_state) {
-    Scheduler::get_instance().schedule_command(std::move(*m_on_change));
+    Scheduler::get_instance().schedule_command(m_on_change->get());
   }
 
   /* trigger: while_true */
   if (m_while_true) {
     if (current_state && !(*m_while_true)->m_is_alive) {
-      Scheduler::get_instance().schedule_command(std::move(*m_while_true));
+      Scheduler::get_instance().schedule_command(m_while_true->get());
     } else if (!current_state && (*m_while_true)->m_is_alive) {
       (*m_while_true)->cancel();
     }
@@ -46,7 +46,7 @@ void Trigger::execute() {
   /* trigger: while_false */
   if (m_while_false) {
     if (!current_state && !(*m_while_false)->m_is_alive) {
-      Scheduler::get_instance().schedule_command(std::move(*m_while_false));
+      Scheduler::get_instance().schedule_command(m_while_false->get());
     } else if (current_state && (*m_while_false)->m_is_alive) {
       (*m_while_false)->cancel();
     }
