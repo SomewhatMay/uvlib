@@ -1,85 +1,87 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.23)
 
-set(This uvlib)
-set(ThisTest ${This}-test)
-
-project(${This} C CXX)
-
-set(CMAKE_C_STANDARD 99)
-set(CMAKE_CXX_STANDARD 20)
+project(uvlib)
 
 option(ENABLE_TESTS "Enable test build" ON)
 
-## Build Sources ##
-
-file(GLOB_RECURSE UVLIB_SOURCES "src/uvlib/*.c" "src/uvlib/*.cpp")
-file(GLOB_RECURSE PROS_SOURCES "src/pros/*.c" "src/pros/*.cpp")
-file(GLOB_RECURSE LIBLVGL_SOURCES "src/liblvgl/*.c" "src/liblvgl/*.cpp")
-
-set(Sources
-  ${UVLIB_SOURCES}
-  ${PROS_SOURCES}
-  ${LIBLVGL_SOURCES}
-)
-
-file(GLOB_RECURSE UVLIB_HEADERS "include/uvlib/*.c" "include/uvlib/*.cpp")
-file(GLOB_RECURSE PROS_HEADERS "include/pros/*.c" "include/pros/*.cpp")
-file(GLOB_RECURSE LIBLVGL_HEADERS "include/liblvgl/*.c" "include/liblvgl/*.cpp")
-
-set(Headers
-  include/main.h
-  include/api.h
-  ${UVLIB_SOURCES}
-  ${PROS_SOURCES}
-  ${LIBLVGL_SOURCES}
-)
-
-## Main ##
+set(CMAKE_CXX_STANDARD 20)
 
 if (ENABLE_TESTS)
 	# Add Google Test as a submodule
+	set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+	set(FIRMWARE_DIR ${CMAKE_SOURCE_DIR}/firmware)
 	set(GOOGLETEST_PATH ${CMAKE_SOURCE_DIR}/external/googletest)
+
 	add_subdirectory(${GOOGLETEST_PATH} ${CMAKE_BINARY_DIR}/googletest-build)
 
-  file(GLOB_RECURSE TEST_SOURCES "tests/*.c" "tests/*.cpp")
+	file(GLOB_RECURSE LIBLVGL_HEADERS 
+		${INCLUDE_DIR}/liblvgl/*.h 
+		${INCLUDE_DIR}/liblvgl/*.hpp 
+	)
+
+	file(GLOB_RECURSE PROS_HEADERS 
+		${INCLUDE_DIR}/pros/*.h 
+		${INCLUDE_DIR}/pros/*.hpp 
+	)
 
 	# Add the test executable
 	add_executable(
-    tests/main.cpp
-    ${ThisTest}
-		${Sources}
-    ${Headers}
-    ${TEST_SOURCES}
+		uvlib-tests
+
+		${LIBLVGL_HEADERS}
+		${PROS_HEADERS}
+
+		# include/main.h
+		# include/api.h
+		
+		src/uvlib/scheduler.cpp
+		src/uvlib/subsystem.cpp
+		src/uvlib/commands/command.cpp
+		src/uvlib/commands/commandptr.cpp
+		src/uvlib/input/controller.cpp
+		src/uvlib/input/trigger.cpp
+		src/uvlib/input/joystick.cpp
+
+		src/main.cpp
+		src/test.cpp
 	)
 
 	target_include_directories(
-		${ThisTest}
+		uvlib-tests
 		PUBLIC
+
 		${CMAKE_SOURCE_DIR}/include
+		${CMAKE_SOURCE_DIR}/pros
+		${CMAKE_SOURCE_DIR}/liblvgl
 		${CMAKE_SOURCE_DIR}/tests
 	)
 
-	target_compile_definitions(${ThisTest} PRIVATE TESTING)
+	target_compile_definitions(uvlib-tests PRIVATE TESTING)
 
 	# Link Google Test
 	target_link_libraries(
-		${ThisTest}
+		uvlib-tests
+
 		gtest
 		gtest_main
+
+		${FIRMWARE_DIR}/libc.a
+    ${FIRMWARE_DIR}/liblvgl.a
+    ${FIRMWARE_DIR}/libm.a
+    ${FIRMWARE_DIR}/libpros.a
 	)
 
 	enable_testing()
-	add_test(NAME ${ThisTest} COMMAND ${ThisTest})
+	add_test(NAME uvlib-tests COMMAND uvlib-tests)
 else()
 	# Add the executables
 	add_executable(
-    src/main.cpp
-		${This}
-		${Sources}
+		uvlib
+		src/main.cpp
 	)
 
 	target_include_directories(
-		${This}
+		uvlib
 		PUBLIC
 		${CMAKE_SOURCE_DIR}/include
 	)
