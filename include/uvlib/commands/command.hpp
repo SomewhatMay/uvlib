@@ -1,28 +1,91 @@
 #pragma once
 
-#include <forward_list>
-#include <optional>
-#include <vector>
+#include <initializer_list>
+#include <list>
 
+#include "uvlib/enums.hpp"
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
 class Command {
+  friend class Scheduler;
+
+ public:
+  Command() = default;
+
+  ~Command();
+
+  /**
+   * Commands cannot be copied around; they must
+   * be moved.
+   */
+  Command(const Command&) = delete;
+  Command& operator=(const Command& rhs) = delete;
+
+  Command(Command&&) = default;
+  Command& operator=(Command&&) = default;
+
+  /**
+   * Cancels the command by setting it as not alive
+   * so it is not executed in future ticks (unless
+   * rescheduled) and is also removed from the
+   * command_chain in the next tick.
+   */
+  void cancel();
+
+  const std::list<Subsystem*>& get_requirements() const;
+
+ protected:
+  void add_requirements(std::initializer_list<Subsystem*>);
+
+  virtual void initialize();
+
+  virtual void execute();
+
+  /**
+   * It is generally a good idea to keep all actions inside
+   * this method to be short and read-only operations. If
+   * the command is finished, it is strongly encouraged to
+   * move the finished logic to end().
+   *
+   * WARNING: This method should not assign any values inside
+   * any subsystems. Doing so can cause undefined behaviour.
+   */
+  virtual bool is_finished();
+
+  /**
+   * Automatically called when the command is ended by
+   * the on_end(bool) member function.
+   *
+   * WARNING: Users should NEVER call this method directly;
+   * use the Command::cancel() method instead.
+   */
+  virtual void end(bool interrupted);
+
  private:
-  ScheduleDirection scheduleDirection = ScheduleDirection::kTop;
+  /**
+   * The method called by the scheduler when a
+   * command is ended. This handles internal
+   * actions that must happen when the command comes
+   * to an end, and will call end(bool) on its own
+   * when possible.
+   *
+   * NOTE: end(bool) is always called before any and_then,
+   * catch, or finally commands are scheduled.
+   */
+  void on_end(bool interrupted);
 
-  std::list<Subsystem*> requirements;
+ private:
+  ScheduleDirection m_scheduleDirection = ScheduleDirection::kTop;
 
-  std::optional<std::forward_list<commandptr_t>> and_then_commands;
-  std::optional<std::forward_list<commandptr_t>> on_interrupted_commands;
-  std::optional<std::forward_list<commandptr_t>> finally_commands;
+  std::list<Subsystem*> m_requirements;
 
   /**
    * The last tick at which the command was executed in.
    * This is helpful to ensure no command is executed more
    * than once in a single tick.
    */
-  int tick_number = -1;
+  int m_tick_number = -1;
 
   /**
    * Whether the command has been scheduled to be executed
@@ -39,119 +102,6 @@ class Command {
    * requires another subsystem that has already been used
    * by another command in the same tick.
    */
-  bool is_alive = false;
-
- protected:
-  void set_requirements(const initializer_subsystems_t& requirements);
-
- public:
-  virtual ~Command() = default;
-
-  virtual void initialize();
-
-  virtual void execute();
-
-  /**
-   * It is generally a good idea to keep all actions inside
-   * this method to be short and read-only operations. If
-   * the command is finished, it is strongly encouraged to
-   * move the finished logic to end().
-   *
-   * WARNING: This method should not assign any values inside
-   * any subsystems. Doing so can cause undefined behaviour.
-   */
-  virtual bool is_finished() = 0;
-
-  /**
-   * Automatically called when the command is ended by
-   * the on_end(bool) member function.
-   *
-   * WARNING: Users should NEVER call this method directly;
-   * use the Command::cancel() method instead.
-   */
-  virtual void end(bool interrupted);
-
-  /**
-   * The method called by the scheduler when a
-   * command is ended. This handles internal
-   * actions that must happen when the command comes
-   * to an end, and will call end(bool) on its own
-   * when possible.
-   *
-   * NOTE: end(bool) is always called before any and_then,
-   * catch, or finally commands are scheduled.
-   */
-  void on_end(bool interrupted);
-
-  /**
-   * Cancels the command by setting it as not alive
-   * so it is not executed in future ticks (unless
-   * rescheduled) and is also removed from the
-   * command_chain in the next tick.
-   */
-  void cancel();
-
-  /* Command Composition */
-
-  /* composition: and_then */
-  cmdptr<Command> and_then(cmdptr<Command> command);
-
-  template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> and_then(Args&&... constructor_args) {
-    static_assert(std::is_base_of_v<Command, DerivedCommand>,
-                  "DerivedCommand must inherit from Command");
-
-    cmdptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...);
-    and_then(command);
-    return command;
-  }
-
-  /* composition: on_interrupted */
-  cmdptr<Command> on_interrupted(cmdptr<Command> command);
-
-  template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> on_interrupted(Args&&... constructor_args) {
-    cmdptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...);
-    on_interrupted(command);
-    return command;
-  }
-
-  /* composition: finally */
-  cmdptr<Command> finally(cmdptr<Command> command);
-
-  template <typename DerivedCommand, typename... Args>
-  cmdptr<DerivedCommand> finally(Args&&... constructor_args) {
-    cmdptr<DerivedCommand> command = std::make_shared<DerivedCommand>(
-        std::forward<Args>(constructor_args)...);
-    finally(command);
-    return command;
-  }
-
-  /* Getters and Setters */
-
-  const std::list<Subsystem*>& get_requirements() const;
-
-  bool get_alive() const;
-
-  void set_alive(bool alive);
-
-  ScheduleDirection get_schedule_direction() const;
-
-  void set_schedule_direction(ScheduleDirection direction);
-
-  /**
-   * Internal method.
-   */
-  void set_tick_number(int tick_number);
-
-  int get_tick_number() const;
+  bool m_is_alive = false;
 };
-
-template <typename DerivedCommand, typename... Args>
-cmdptr<DerivedCommand> mkcmd(Args&&... constructor_args) {
-  return std::make_shared<DerivedCommand>(
-      std::forward<Args>(constructor_args)...);
-}
 }  // namespace uvl
