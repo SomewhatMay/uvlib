@@ -12,11 +12,6 @@ namespace uvl {
  * Use this to poll inputs from the joysticks.
  */
 class Joystick {
- private:
-  pros::Controller* controller;
-
-  AnalogStick stick;
-
  public:
   explicit Joystick(pros::Controller* controller, AnalogStick stick);
 
@@ -35,6 +30,11 @@ class Joystick {
    * trigger is connected to.
    */
   const pros::Controller& get_controller() const { return *controller; }
+
+ private:
+  pros::Controller* controller;
+
+  AnalogStick stick;
 };
 
 }  // namespace uvl

@@ -18,6 +18,12 @@ class Controller : public Subsystem {
 
   explicit Controller(pros::controller_id_e_t id);
 
+  Controller(const Controller&) = delete;
+  Controller& operator=(const Controller&) = delete;
+
+  Controller(Controller&&) = delete;
+  Controller& operator=(Controller&&) = delete;
+
   ~Controller();
 
   /**
