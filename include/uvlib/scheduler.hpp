@@ -50,12 +50,6 @@ class Scheduler : public Singleton<Scheduler> {
   void mainloop();
 
   /**
-   * Internal method only: to be used by the subsystem superclass
-   * automatically.
-   */
-  void register_subsystem(Subsystem *subsystem);
-
-  /**
    * Schedule a command to be considered by the
    * scheduler for the next tick.
    *
@@ -122,6 +116,7 @@ class Scheduler : public Singleton<Scheduler> {
 
  private:
   friend class Singleton;
+  friend class Subsystem;
 
   Scheduler() = default;
 
@@ -140,6 +135,12 @@ class Scheduler : public Singleton<Scheduler> {
    * the scheduler when they are no longer alive.
    */
   std::unordered_map<Command *, CommandPtr> m_owned_commands;
+
+  /**
+   * Internal method only: to be used by the subsystem superclass
+   * automatically.
+   */
+  void register_subsystem(Subsystem *subsystem);
 
   /**
    * Runs an iteration ("a tick") of the scheduler, executing all
