@@ -48,7 +48,9 @@ pros c uninstall uvlib
 ```
 
 ## 📖 Documentation
-*Currently under construction. Every class and method is well-documented; see the header files in* [`include/uvlib/`](https://github.com/SomewhatMay/uvlib/tree/dev/include/uvlib)*.*
+*Documentation is currently under work. Every class and method is well-documented; see the header files in* [`include/uvlib/`](include/uvlib)*.*
+
+To see very basic example robot code with a Drivetrain subsystem, commands, and Controller triggers, [see the example.cpp](src/example.cpp).
 
 ## 🔥 Inspiration
 Much of this project was inspired by [WPILib](https://docs.wpilib.org/en/stable/index.html) and its Command-Based Programming structure. WPILib is the library trusted by hundreds of FIRST Robotics teams worldwide. Many of the design decisions were made to align with WPILib's implementation. You can learn more about the paradigm [here](https://docs.wpilib.org/en/stable/docs/software/commandbased/index.html).
