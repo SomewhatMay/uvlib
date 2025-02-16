@@ -1,12 +1,9 @@
-name: "CodeQL Advanced"
+name: "CodeQL Advanced Analysis"
 
 on:
-  push:
-    branches: [ "dev", "main", "release" ]
-  pull_request:
-    branches: [ "dev", "main", "release" ]
   schedule:
-    - cron: '18 16 * * 1'
+    - cron: '00 18 * * *'
+  workflow_dispatch: 
 
 jobs:
   analyze:
