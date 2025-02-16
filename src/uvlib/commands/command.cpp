@@ -27,4 +27,6 @@ const std::list<Subsystem*>& Command::get_requirements() const {
   return m_requirements;
 }
 
+const bool& Command::is_alive() const { return m_is_alive; }
+
 }  // namespace uvl

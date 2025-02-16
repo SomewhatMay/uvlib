@@ -98,11 +98,12 @@ void Scheduler::cancel_command(Command *command) {
     command->m_is_alive = false;
 
     free_requirements(command);
-    dealloc_owned_command(command);
 
     m_scheduled_commands.remove(command);
     command->on_end(true);
   }
+
+  dealloc_owned_command(command);
 }
 
 void Scheduler::cancel_command(CommandPtr &&command) {

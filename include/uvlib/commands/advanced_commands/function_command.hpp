@@ -14,11 +14,12 @@ class FunctionCommand : public CommandHelper<Command, FunctionCommand> {
                   std::function<bool()> is_finished,
                   std::function<void(bool interrupted)> end);
 
+  bool is_finished() override;
+
+ protected:
   void initialize() override;
 
   void execute() override;
-
-  bool is_finished() override;
 
   void end(bool interrupted) override;
 

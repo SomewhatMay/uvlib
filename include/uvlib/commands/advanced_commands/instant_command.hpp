@@ -13,9 +13,10 @@ class InstantCommand : public CommandHelper<Command, InstantCommand> {
   InstantCommand(std::function<void()> callback,
                  std::initializer_list<Subsystem*> requirements);
 
-  void execute() override;
-
   bool is_finished() override;
+
+ protected:
+  void execute() override;
 
   void end(bool interrupted) override;
 

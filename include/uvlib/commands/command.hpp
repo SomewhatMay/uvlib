@@ -47,6 +47,32 @@ class Command {
    */
   const std::list<Subsystem*>& get_requirements() const;
 
+  /**
+   * Returns true if the command is currently alive, false otherwise.
+   *
+   * @note used internally to check whether the command is still in the
+   * scheduler command list.
+   */
+  const bool& is_alive() const;
+
+  /**
+   * Return true if and only if the command has achieved
+   * its goal.
+   *
+   * NOTE: This method must return true if the command is finished, regardless
+   * of how many times it is called consecutively. Do not code this method in a
+   * way that it only returns true once if the command is finished.
+   *
+   * NOTE: It is generally a good idea to keep all actions
+   * inside this method to be short and read-only operations.
+   * If the command is finished, it is strongly encouraged to
+   * move the end behaviour to Command::end().
+   *
+   * WARNING: This method should not assign any values inside
+   * any subsystems. Doing so can cause undefined behaviour.
+   */
+  virtual bool is_finished();
+
  protected:
   /**
    * Appends to the list of subsystem requirements.
@@ -72,20 +98,6 @@ class Command {
   virtual void execute();
 
   /**
-   * Return true if and only if the command has achieved
-   * its goal.
-   *
-   * NOTE: It is generally a good idea to keep all actions
-   * inside this method to be short and read-only operations.
-   * If the command is finished, it is strongly encouraged to
-   * move the end behaviour to Command::end().
-   *
-   * WARNING: This method should not assign any values inside
-   * any subsystems. Doing so can cause undefined behaviour.
-   */
-  virtual bool is_finished();
-
-  /**
    * Called when a command is either finished (determined
    * by Command::is_finished()), or when it is interrupted
    * (Command::cancel() or another resource requires the subsystems).
@@ -100,6 +112,13 @@ class Command {
    */
   virtual void end(bool interrupted);
 
+  /**
+   * Determines where in the command list the scheduler will place this command.
+   * Very helpful for command groups since all their children commands need to
+   * execute before the parent command can properly query their children.
+   */
+  ScheduleDirection m_schedule_direction = ScheduleDirection::kTop;
+
  private:
   /**
    * The method called by the scheduler when a
@@ -112,9 +131,6 @@ class Command {
    * catch, or finally commands are scheduled.
    */
   void on_end(bool interrupted);
-
- private:
-  ScheduleDirection m_schedule_direction = ScheduleDirection::kTop;
 
   std::list<Subsystem*> m_requirements;
 
