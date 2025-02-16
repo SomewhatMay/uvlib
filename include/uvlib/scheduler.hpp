@@ -150,5 +150,17 @@ class Scheduler : public Singleton<Scheduler> {
    * by the Scheduler::mainloop() method.
    */
   void run();
+
+  /**
+   * Remove a command's requirements from the m_active_subsystems
+   * map to mark all subsystems as free for any new command to use.
+   */
+  void free_requirements(Command *command);
+
+  /**
+   * If the scheduler owns command, deallocate it. Otherwise,
+   * do nothing.
+   */
+  void dealloc_owned_command(Command *command);
 };
 }  // namespace uvl

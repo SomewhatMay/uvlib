@@ -12,8 +12,6 @@ namespace uvl {
 /* Keep track of the number of ticks */
 int tick_number = 0;
 
-/* Other Methods */
-
 void Scheduler::initialize() {
   for (Subsystem *subsystem : m_registered_subsystems) {
     subsystem->initialize();
@@ -50,7 +48,8 @@ bool Scheduler::schedule_command(Command *command) {
 
   for (auto active_command : conflicting_cmds) {
     // This should also remove this command's requirements
-    // from the m_active_subsystems map
+    // from the m_active_subsystems map and dealloc the command
+    // if the scheduler owns it.
     cancel_command(active_command);
   }
 
@@ -83,20 +82,26 @@ bool Scheduler::schedule_command(CommandPtr &&command) {
   return false;
 }
 
+void Scheduler::free_requirements(Command *command) {
+  for (auto subsystem : command->get_requirements()) {
+    m_active_subsystems.erase(subsystem);
+  }
+}
+
+void Scheduler::dealloc_owned_command(Command *command) {
+  auto owned_command = m_owned_commands.find(command);
+  if (owned_command != m_owned_commands.end()) {
+    // FIXME ensure this does call the destructor of the CommandPtr
+    m_owned_commands.erase(owned_command);
+  }
+}
+
 void Scheduler::cancel_command(Command *command) {
   if (command->m_is_alive) {
     command->m_is_alive = false;
 
-    // Remove the requirements from the active subsystems map
-    for (auto subsystem : command->get_requirements()) {
-      m_active_subsystems.erase(subsystem);
-    }
-
-    auto owned_command = m_owned_commands.find(command);
-    if (owned_command != m_owned_commands.end()) {
-      // FIXME ensure this does call the destructor of the CommandPtr
-      m_owned_commands.erase(owned_command);
-    }
+    free_requirements(command);
+    dealloc_owned_command(command);
 
     m_scheduled_commands.remove(command);
     command->on_end(true);
@@ -110,7 +115,7 @@ void Scheduler::cancel_command(CommandPtr &&command) {
 void Scheduler::run() {
   /* Execute all commands */
   for (auto command_it = m_scheduled_commands.begin();
-       command_it != m_scheduled_commands.end(); command_it++) {
+       command_it != m_scheduled_commands.end();) {
     Command *target = *command_it;
 
     if (!target->m_is_alive || target->is_finished()) {
@@ -119,6 +124,8 @@ void Scheduler::run() {
         // for is_finished, and therefore executed without
         // any interruption.
         target->m_is_alive = false;
+        free_requirements(target);
+        dealloc_owned_command(target);
         target->on_end(false);
       }
 
@@ -151,17 +158,20 @@ void Scheduler::run() {
   /* Execute all subsystems and default commands */
   for (Subsystem *subsystem : m_registered_subsystems) {
     // Execute the default command of the subsystem if
-    // and only if no other commands have this subsystem as
-    // a requirement.
-    if (m_active_subsystems.contains(subsystem)) {
-      std::optional<CommandPtr> &default_command_container =
-          subsystem->m_default_command;
+    // and only if no other command has used this subsystem as
+    // this tick.
+    std::optional<CommandPtr> &default_command_container =
+        subsystem->m_default_command;
+    if (default_command_container) {
+      CommandPtr &default_command = *default_command_container;
 
-      if (default_command_container) {
-        CommandPtr &default_command = *default_command_container;
+      // True if the default command has successfully executed this tick.
+      bool executed = false;
+
+      if (!m_active_subsystems.contains(subsystem)) {
         // Ensure the command has not already been executed
-        // this tick, that all its required subsystems
-        // are untouched, and that it is not finished.
+        // this tick, that all its required subsystems are
+        // untouched, and that the command is not finished.
 
         bool is_runnable_command = true;
         for (auto requirement : default_command->get_requirements()) {
@@ -180,15 +190,23 @@ void Scheduler::run() {
 
           default_command->m_tick_number = tick_number;
           default_command->execute();
-        } else if (default_command->m_is_alive) {
-          // the command was alive the previous tick but has been
-          // interrupted. We need to call on_end() to properly clean up.
-          default_command->m_is_alive = false;
-          default_command->on_end(true);
+          executed = true;
         }
+      }
+
+      if (!executed && default_command->m_is_alive) {
+        // The default command was alive the previous tick but has been
+        // interrupted. We need to call on_end() to properly clean up.
+        default_command->m_is_alive = false;
+        default_command->on_end(true);
+        // No need to free the requirements because default commands never
+        // add their requirements to the m_active_subsystems map. This is
+        // because they are always executed after all other scheduled commands,
+        // if and only if no other command has used their requirements.
       }
     }
 
+    // Subsystems get executed last.
     subsystem->periodic();
   }
 }
