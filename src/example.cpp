@@ -24,10 +24,15 @@ class Drivetrain : public uvl::Subsystem {
     std::cout << "Drivetrain initialized" << std::endl;
   }
 
-  void periodic() override { std::cout << "Drivetrain periodic" << std::endl; }
+  void periodic() override {
+    std::cout << "Drivetrain position " << m_position << std::endl;
+    m_position += m_velocity;
+  }
 
   void set_voltage(int voltage) {
     std::cout << "Drivetrain voltage: " << voltage << std::endl;
+    m_voltage = voltage;
+    set_velocity(voltage * 10);
   }
 
   int get_position() { return m_position; }
@@ -47,6 +52,7 @@ class Drivetrain : public uvl::Subsystem {
  private:
   int m_position = 0;
   int m_velocity = 0;
+  int m_voltage = 0;
 };
 
 /* Simple Example Commands */
@@ -98,11 +104,18 @@ class MoveFollowController
     m_drivetrain->set_position(0);
   }
 
+  // Follow the joystick input and move the drivetrain accordingly.
   void execute() override {
     m_drivetrain->set_voltage(m_left_joystick.get_y());
   }
 
+  // This command never ends on its own. It only ends when it is interrupted by
+  // another command.
   bool is_finished() override { return false; }
+
+  // When the command is interrupted, it's important to reset the state of the
+  // robot.
+  void end(bool interrupted) override { m_drivetrain->set_voltage(0); }
 
  private:
   Drivetrain* m_drivetrain;
