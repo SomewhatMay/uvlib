@@ -121,6 +121,8 @@ class Scheduler : public Singleton<Scheduler> {
       const;
 
  private:
+  friend class Singleton;
+
   Scheduler() = default;
 
   std::list<Command *> m_scheduled_commands;

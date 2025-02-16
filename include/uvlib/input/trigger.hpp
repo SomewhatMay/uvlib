@@ -86,6 +86,8 @@ class Trigger {
   const pros::Controller& get_controller() const { return *controller; }
 
  private:
+  friend class Controller;
+
   pros::Controller* controller;
 
   TriggerButton button;

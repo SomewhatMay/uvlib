@@ -7,6 +7,7 @@
 #include "uvlib/subsystem.hpp"
 
 namespace uvl {
+class Scheduler;
 /**
  * Manages input variants from a specific controller.
  *
@@ -68,6 +69,8 @@ class Controller : public Subsystem {
   };
 
  private:
+  friend class Scheduler;
+
   /**
    * Determines whether the controller should be
    * destroyed when this object is destroyed.
