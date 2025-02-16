@@ -89,11 +89,8 @@ void Scheduler::free_requirements(Command *command) {
 }
 
 void Scheduler::dealloc_owned_command(Command *command) {
-  auto owned_command = m_owned_commands.find(command);
-  if (owned_command != m_owned_commands.end()) {
-    // FIXME ensure this does call the destructor of the CommandPtr
-    m_owned_commands.erase(owned_command);
-  }
+  // FIXME ensure this does call the destructor of the CommandPtr
+  m_owned_commands.erase(command);
 }
 
 void Scheduler::cancel_command(Command *command) {
