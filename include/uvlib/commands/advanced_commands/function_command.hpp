@@ -1,9 +1,11 @@
 #pragma once
 
 #include <functional>
+#include <initializer_list>
 
 #include "uvlib/commands/command.hpp"
 #include "uvlib/commands/command_helper.hpp"
+#include "uvlib/subsystem.hpp"
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
@@ -12,7 +14,8 @@ class FunctionCommand : public CommandHelper<Command, FunctionCommand> {
   FunctionCommand(std::function<void()> initialize,
                   std::function<void()> execute,
                   std::function<bool()> is_finished,
-                  std::function<void(bool interrupted)> end);
+                  std::function<void(bool interrupted)> end,
+                  std::initializer_list<Subsystem*> requirements);
 
   bool is_finished() override;
 

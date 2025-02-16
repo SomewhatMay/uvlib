@@ -4,11 +4,14 @@ namespace uvl {
 FunctionCommand::FunctionCommand(std::function<void()> initialize,
                                  std::function<void()> execute,
                                  std::function<bool()> is_finished,
-                                 std::function<void(bool interrupted)> end)
+                                 std::function<void(bool interrupted)> end,
+                                 std::initializer_list<Subsystem*> requirements)
     : m_initialize(std::move(initialize)),
       m_execute(std::move(execute)),
       m_is_finished(std::move(is_finished)),
-      m_end(std::move(end)) {}
+      m_end(std::move(end)) {
+  add_requirements(requirements);
+}
 
 void FunctionCommand::initialize() { m_initialize(); }
 
