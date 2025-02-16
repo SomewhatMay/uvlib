@@ -7,15 +7,15 @@
 template <typename T>
 class Singleton {
  public:
-  // Deletes copy constructor and copy assignment
+  // Delete copy constructor and copy assignment
   Singleton(const Singleton&) = delete;
   Singleton& operator=(const Singleton&) = delete;
 
-  // Deletes move constructor and move assignment
+  // Delete move constructor and move assignment
   Singleton(Singleton&&) = delete;
   Singleton& operator=(Singleton&&) = delete;
 
-  // Provides global access to the singleton instance
+  // Provide global access to the singleton instance
   static T& get_instance() {
     static T instance;
     return instance;

@@ -121,6 +121,8 @@ class Scheduler : public Singleton<Scheduler> {
       const;
 
  private:
+  Scheduler() = default;
+
   std::list<Command *> m_scheduled_commands;
   std::list<Subsystem *> m_registered_subsystems;
 
