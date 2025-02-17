@@ -6,6 +6,8 @@
 
 #include "main.h"
 #include "uvlib/command_api.hpp"
+#include "uvlib/commands/advanced_commands/instant_command.hpp"
+#include "uvlib/commands/advanced_commands/wait_command.hpp"
 #include "uvlib/enums.hpp"
 #include "uvlib/input_api.hpp"
 #include "uvlib/scheduler.hpp"
@@ -42,6 +44,12 @@ int test_main() {
                   uvl::InstantCommand(
                       []() { std::cout << "Third command executed\n"; }, {})
                       .to_ptr()));
+
+  master.get_trigger(uvl::TriggerButton::kY)
+      .on_true(uvl::WaitCommand(3000).and_then(
+          uvl::InstantCommand(
+              []() { std::cout << "Command executed 3 seconds later!\n"; }, {})
+              .to_ptr()));
 
   return 0;
 }
