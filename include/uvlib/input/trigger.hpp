@@ -30,6 +30,16 @@ public:
   Trigger(Trigger &&) = delete;
   Trigger &operator=(Trigger &&) = delete;
 
+  /**
+   * @brief Return true if and only if the trigger is currently being held down.
+   *
+   * Analogous to the pros::Controller::get_digital(<TriggerButton>);
+   *
+   * @return true
+   * @return false
+   */
+  bool poll();
+
   /* Trigger Methods */
 
   /**
