@@ -8,8 +8,10 @@
 
 namespace uvl {
 /**
- * Any precise set of instructions the robot should
- * take, given a specific event.
+ * Any precise set of instructions the robot should take, given a specific
+ * event.
+ *
+ * Ex. EnableElevator, DriveForward, LiftArm, etc.
  */
 class Command {
   friend class Scheduler;
@@ -31,19 +33,17 @@ class Command {
   Command& operator=(Command&&) = default;
 
   /**
-   * Cancels the command by setting it as not alive
-   * so it is not executed in future ticks (unless
-   * rescheduled) and is also removed from the
+   * Cancels the command by setting it as not alive so it is not executed in
+   * future ticks (unless rescheduled) and is also removed from the
    * command_chain in the next tick.
    */
   void cancel();
 
   /**
-   * Every command has a set of subsystem requirements.
-   * These subsystems must be free for the command to
-   * execute. This ensures two commands do not try to
-   * change the state of a singular subsystem at the same
-   * time, which may lead to unexpected behaviour.
+   * Every command has a set of subsystem requirements. These subsystems must be
+   * free for the command to execute. This ensures two commands do not try to
+   * change the state of a singular subsystem at the same time, which may lead
+   * to unexpected behaviour.
    */
   const std::list<Subsystem*>& get_requirements() const;
 
@@ -56,20 +56,18 @@ class Command {
   const bool& is_alive() const;
 
   /**
-   * Return true if and only if the command has achieved
-   * its goal.
+   * Return true if and only if the command has achieved its goal.
    *
-   * NOTE: This method must return true if the command is finished, regardless
+   * @note This method must return true if the command is finished, regardless
    * of how many times it is called consecutively. Do not code this method in a
    * way that it only returns true once if the command is finished.
    *
-   * NOTE: It is generally a good idea to keep all actions
-   * inside this method to be short and read-only operations.
-   * If the command is finished, it is strongly encouraged to
-   * move the end behaviour to Command::end().
+   * @note It is generally a good idea to keep all actions inside this method to
+   * be short and read-only operations. If the command is finished, it is
+   * strongly encouraged to move the end behaviour to Command::end().
    *
-   * WARNING: This method should not assign any values inside
-   * any subsystems. Doing so can cause undefined behaviour.
+   * @warning This method should not assign any values inside any subsystems.
+   * Doing so can cause undefined behaviour.
    */
   virtual bool is_finished();
 
@@ -78,16 +76,14 @@ class Command {
    * Appends to the list of subsystem requirements.
    *
    * To learn more,
-   * @see Command::get_requirements()
+   * @see uvl::Command::get_requirements()
    */
   void add_requirements(std::initializer_list<Subsystem*>);
 
   /**
-   * Implement any initialization logic here. Since
-   * commands are reusable and are only instantiated
-   * once, this method can be used to properly initialize
-   * any internal state before Command::execute() is
-   * called.
+   * Implement any initialization logic here. Since commands are reusable and
+   * are only instantiated once, this method can be used to properly initialize
+   * any internal state before Command::execute() is called.
    */
   virtual void initialize();
 
@@ -98,17 +94,17 @@ class Command {
   virtual void execute();
 
   /**
-   * Called when a command is either finished (determined
-   * by Command::is_finished()), or when it is interrupted
-   * (Command::cancel() or another resource requires the subsystems).
-   * The interrupted parameter is false if and only if the command
-   * is ended due a true return from Command::is_finished().
+   * Called when a command is either finished (determined by
+   * Command::is_finished()), or when it is interrupted (Command::cancel() or
+   * another resource requires the subsystems). The interrupted parameter is
+   * false if and only if the command is ended due a true return from
+   * Command::is_finished().
    *
    * Automatically called when the command is ended by
    * the on_end(bool) member function.
    *
-   * WARNING: Users should NEVER call this method directly;
-   * use the Command::cancel() method instead.
+   * @warning Users should NEVER call this method directly; use the
+   * Command::cancel() method instead.
    */
   virtual void end(bool interrupted);
 
@@ -121,14 +117,12 @@ class Command {
 
  private:
   /**
-   * The method called by the scheduler when a
-   * command is ended. This handles internal
-   * actions that must happen when the command comes
-   * to an end, and will call end(bool) on its own
-   * when possible.
+   * The method called by the scheduler when a command is ended. This handles
+   * internal actions that must happen when the command comes to an end, and
+   * will call end(bool) on its own when possible.
    *
-   * NOTE: end(bool) is always called before any and_then,
-   * catch, or finally commands are scheduled.
+   * @note end(bool) is always called before any and_then, catch, or finally
+   * commands are scheduled.
    */
   void on_end(bool interrupted);
 
@@ -142,19 +136,17 @@ class Command {
   int m_tick_number = -1;
 
   /**
-   * Whether the command has been scheduled to be executed
-   * for the next tick or not.
+   * Whether the command has been scheduled to be executed for the next tick or
+   * not.
    *
-   * The value is automatically assigned as true by
-   * the scheduler when the command is scheduled
-   * or rescheduled.
+   * The value is automatically assigned as true by the scheduler when the
+   * command is scheduled or rescheduled.
    *
-   * NOTE: If this value is true, the command is not
-   * guaranteed to run, rather, it is only guaranteed to
-   * considered by the scheduler. It may not run if multiple
-   * versions of this command is scheduled or this command
-   * requires another subsystem that has already been used
-   * by another command in the same tick.
+   * @note If this value is true, the command is not guaranteed to run, rather,
+   * it is only guaranteed to considered by the scheduler. It may not run if
+   * multiple versions of this command is scheduled or this command requires
+   * another subsystem that has already been used by another command in the same
+   * tick.
    */
   bool m_is_alive = false;
 };

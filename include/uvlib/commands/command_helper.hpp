@@ -9,9 +9,8 @@
 
 namespace uvl {
 /**
- * Wrap any custom commands with this class
- * to ensure they behave appropriately and
- * can be used throughout uvlib.
+ * Wrap any custom commands with this class to ensure they behave appropriately
+ * and can be used throughout uvlib.
  */
 template <typename Base, typename CRTP>
 class CommandHelper : public Base {

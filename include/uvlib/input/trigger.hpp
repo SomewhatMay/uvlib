@@ -6,21 +6,17 @@
 
 namespace uvl {
 /**
- * A wrapper to the digital buttons on the default
- * VEX controller.
+ * A wrapper to the digital buttons on the default VEX controller.
  *
- * Use this to directly bind Commands to controller
- * behaviour/inputs.
+ * Use this to directly bind Commands to controller behaviour/inputs.
  */
 class Trigger {
  public:
   explicit Trigger(pros::Controller*, TriggerButton button);
 
   /**
-   * NOTE: Triggers can not be moved or copied.
-   *        You must retrieve the trigger from the
-   *        appropriate Controller using
-   *        Controller::get_trigger();
+   * @note Triggers can not be moved or copied. You must retrieve the trigger
+   * from the appropriate Controller using Controller::get_trigger();
    */
   Trigger(const Trigger&) = delete;
   Trigger& operator=(const Trigger&) = delete;
@@ -31,31 +27,28 @@ class Trigger {
   /* Trigger Methods */
 
   /**
-   * Executed when the specified trigger's status turns from
-   * false to true.
+   * Executed when the specified trigger's status turns from false to true.
    *
-   * Ex. when the user presses the right trigger, schedule
-   * command to be executed. Do nothing if the user continues
-   * to hold right trigger.
+   * Ex. when the user presses the right trigger, schedule command to be
+   * executed. Do nothing if the user continues to hold right trigger.
    */
   Trigger& on_true(CommandPtr&& command);
 
   /**
-   * Same as Trigger::on_true, except schedules the command
-   * when the trigger's state goes from true to false.
+   * Same as Trigger::on_true, except schedules the command when the trigger's
+   * state goes from true to false.
    *
    * @see Trigger:on_true();
    */
   Trigger& on_false(CommandPtr&& command);
 
   /**
-   * Executed when the specified trigger's status turns from
-   * false to true or vice versa.
+   * Executed when the specified trigger's status turns from false to true or
+   * vice versa.
    *
-   * Ex. when the user presses the right trigger, schedule
-   * command to be executed. Do nothing if the user continues
-   * to hold right trigger. Reschedule command if the user lets
-   * go of the right trigger.
+   * Ex. when the user presses the right trigger, schedule command to be
+   * executed. Do nothing if the user continues to hold right trigger.
+   * Reschedule command if the user lets go of the right trigger.
    *
    * @see Trigger:on_true();
    * @see Trigger:on_false();
@@ -63,9 +56,9 @@ class Trigger {
   Trigger& on_change(CommandPtr&& command);
 
   /**
-   * Schedule command when the user initially presses the trigger.
-   * When the trigger is released, cancel the command if it has not
-   * successfully completed yet.
+   * Schedule command when the user initially presses the trigger. When the
+   * trigger is released, cancel the command if it has not successfully
+   * completed yet.
    *
    * Internally, this method calls Command::cancel() when the trigger
    * is released.
@@ -101,8 +94,8 @@ class Trigger {
   std::optional<CommandPtr> m_while_false;
 
   /**
-   * Checks and executes all binded triggers.
-   * Executed by the parent controller every tick.
+   * Checks and executes all binded triggers. Executed by the parent controller
+   * every tick.
    */
   void execute();
 };

@@ -7,10 +7,8 @@
 
 namespace uvl {
 /**
- * Wrap around every command to ensure simple
- * and effective memory management. uvlib uses
- * CommandPtr everywhere it can instead of raw
- * pointers.
+ * Wrap around every command to ensure simple and effective memory management.
+ * uvlib uses CommandPtr everywhere it can instead of raw pointers.
  */
 class CommandPtr {
  public:
@@ -31,21 +29,21 @@ class CommandPtr {
   CommandPtr& operator=(CommandPtr&&) = default;
 
   /**
-   * Directly access the internal Command
-   * class by dereferencing this class.
+   * Directly access the internal Command pointer by dereferencing this class.
    */
   Command* operator*();
   Command* operator->();
 
   /**
    * Alias to CommandPtr::operator*()
+   *
+   * @return A pointer to the contained Command object.
    */
   Command* get() const&;
 
   /**
-   * Disallow getting the internal command on
-   * an rvalue command since it would be invalid
-   * anyways
+   * Disallow getting the internal command on an rvalue command since it would
+   * be invalid anyways
    */
   Command* get() && = delete;
 

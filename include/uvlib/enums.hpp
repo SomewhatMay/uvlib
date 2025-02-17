@@ -4,11 +4,10 @@
 
 namespace uvl {
 /**
- * Determines the order that a command is added
- * to the list of commands that will be executed
- * by the scheduler. The scheduler executes commands
- * from top to bottom; therefore, by default, adding
- * commands to the list behaves like a stack.
+ * Determines the order that a command is added to the list of commands that
+ * will be executed by the scheduler. The scheduler executes commands from top
+ * to bottom; therefore, by default, adding commands to the list behaves like a
+ * stack.
  */
 enum struct ScheduleDirection {
   kTop,  // Default
@@ -16,8 +15,7 @@ enum struct ScheduleDirection {
 };
 
 /**
- * Possible input trigger buttons;
- * analogous to pros digital buttons.
+ * Possible input trigger buttons; analogous to pros digital buttons.
  */
 enum struct TriggerButton {
   kL1 = pros::E_CONTROLLER_DIGITAL_L1,
@@ -35,8 +33,7 @@ enum struct TriggerButton {
 };
 
 /**
- * The two analog sticks in a standard
- * VEX controller.
+ * The two analog sticks in a standard VEX controller.
  */
 enum struct AnalogStick { kLeft, kRight };
 }  // namespace uvl

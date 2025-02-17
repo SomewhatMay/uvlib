@@ -9,6 +9,12 @@
 #include "uvlib/typedefs.hpp"
 
 namespace uvl {
+/**
+ * An entire command, in the form of pure lambda functions. When you need
+ * things done quickly and dirty. This command internally creates a command that
+ * has all the regular command member functions such as initialize(), execute(),
+ * is_finished(), and even end().
+ */
 class FunctionCommand : public CommandHelper<Command, FunctionCommand> {
  public:
   FunctionCommand(std::function<void()> initialize,
