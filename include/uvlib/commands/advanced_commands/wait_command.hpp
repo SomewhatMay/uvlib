@@ -15,8 +15,8 @@ public:
    * interrupted when scheduling another command, even if the other command is
    * another WaitCommand!
    *
-   * @param duration The duration this command should wait for before
-   * returning true in is_finished.
+   * @param duration The duration, in miliseconds, this command should wait for
+   * before returning true in is_finished.
    */
   WaitCommand(double duration);
 
