@@ -110,6 +110,12 @@ void Scheduler::cancel_command(CommandPtr &&command) {
   cancel_command(command.get());
 }
 
+void Scheduler::cancel_all_commands() {
+  for (auto command : m_scheduled_commands) {
+    cancel_command(command);
+  }
+}
+
 void Scheduler::run() {
   /* Execute all commands */
   for (auto command_it = m_scheduled_commands.begin();

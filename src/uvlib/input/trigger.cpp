@@ -10,6 +10,8 @@ namespace uvl {
 Trigger::Trigger(pros::Controller* controller, TriggerButton button)
     : controller(controller), button(button) {}
 
+Trigger::~Trigger() { unbind_all(); }
+
 /* Execute */
 
 constexpr pros::controller_digital_e_t to_pros_digital(TriggerButton button) {
@@ -55,7 +57,7 @@ void Trigger::execute() {
   previous_state = current_state;
 }
 
-/* Trigger Methods */
+/* Binding Trigger Methods */
 
 inline void replace_command(std::optional<CommandPtr>* location,
                             CommandPtr&& command) {
@@ -92,6 +94,51 @@ Trigger& Trigger::while_true(CommandPtr&& command) {
 
 Trigger& Trigger::while_false(CommandPtr&& command) {
   replace_command(&m_while_false, std::move(command));
+
+  return *this;
+}
+
+/* Unbinding Trigger Methods */
+
+inline void replace_command(std::optional<CommandPtr>* location) {
+  if (*location) {
+    (*(*location))->cancel();
+  }
+
+  location->reset();
+}
+
+Trigger& Trigger::on_true(std::nullopt_t) {
+  replace_command(&m_on_true);
+  return *this;
+}
+
+Trigger& Trigger::on_false(std::nullopt_t) {
+  replace_command(&m_on_false);
+  return *this;
+}
+
+Trigger& Trigger::on_change(std::nullopt_t) {
+  replace_command(&m_on_change);
+  return *this;
+}
+
+Trigger& Trigger::while_true(std::nullopt_t) {
+  replace_command(&m_while_true);
+  return *this;
+}
+
+Trigger& Trigger::while_false(std::nullopt_t) {
+  replace_command(&m_while_false);
+  return *this;
+}
+
+Trigger& Trigger::unbind_all() {
+  on_true(std::nullopt);
+  on_false(std::nullopt);
+  on_change(std::nullopt);
+  while_true(std::nullopt);
+  while_false(std::nullopt);
 
   return *this;
 }
