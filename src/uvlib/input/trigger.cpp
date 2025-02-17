@@ -7,7 +7,7 @@
 #include "uvlib/scheduler.hpp"
 
 namespace uvl {
-Trigger::Trigger(pros::Controller* controller, TriggerButton button)
+Trigger::Trigger(pros::Controller *controller, TriggerButton button)
     : controller(controller), button(button) {}
 
 Trigger::~Trigger() { unbind_all(); }
@@ -18,21 +18,25 @@ constexpr pros::controller_digital_e_t to_pros_digital(TriggerButton button) {
   return static_cast<pros::controller_digital_e_t>(button);
 }
 
+bool Trigger::poll() {
+  return controller->get_digital(to_pros_digital(button));
+}
+
 void Trigger::execute() {
   bool current_state = controller->get_digital(to_pros_digital(button));
 
   /* trigger: on_true */
-  if (m_on_true && current_state && !previous_state) {
+  if (current_state && !previous_state && m_on_true) {
     Scheduler::get_instance().schedule_command(m_on_true->get());
   }
 
   /* trigger: on_false */
-  if (m_on_false && !current_state && previous_state) {
+  if (!current_state && previous_state && m_on_false) {
     Scheduler::get_instance().schedule_command(m_on_false->get());
   }
 
   /* trigger: on_change */
-  if (m_on_change && current_state != previous_state) {
+  if (current_state != previous_state && m_on_change) {
     Scheduler::get_instance().schedule_command(m_on_change->get());
   }
 
@@ -59,8 +63,8 @@ void Trigger::execute() {
 
 /* Binding Trigger Methods */
 
-inline void replace_command(std::optional<CommandPtr>* location,
-                            CommandPtr&& command) {
+inline void replace_command(std::optional<CommandPtr> *location,
+                            CommandPtr &&command) {
   if (*location) {
     (*(*location))->cancel();
   }
@@ -68,31 +72,31 @@ inline void replace_command(std::optional<CommandPtr>* location,
   *location = std::move(command);
 }
 
-Trigger& Trigger::on_true(CommandPtr&& command) {
+Trigger &Trigger::on_true(CommandPtr &&command) {
   replace_command(&m_on_true, std::move(command));
 
   return *this;
 }
 
-Trigger& Trigger::on_false(CommandPtr&& command) {
+Trigger &Trigger::on_false(CommandPtr &&command) {
   replace_command(&m_on_false, std::move(command));
 
   return *this;
 }
 
-Trigger& Trigger::on_change(CommandPtr&& command) {
+Trigger &Trigger::on_change(CommandPtr &&command) {
   replace_command(&m_on_change, std::move(command));
 
   return *this;
 }
 
-Trigger& Trigger::while_true(CommandPtr&& command) {
+Trigger &Trigger::while_true(CommandPtr &&command) {
   replace_command(&m_while_true, std::move(command));
 
   return *this;
 }
 
-Trigger& Trigger::while_false(CommandPtr&& command) {
+Trigger &Trigger::while_false(CommandPtr &&command) {
   replace_command(&m_while_false, std::move(command));
 
   return *this;
@@ -100,7 +104,7 @@ Trigger& Trigger::while_false(CommandPtr&& command) {
 
 /* Unbinding Trigger Methods */
 
-inline void replace_command(std::optional<CommandPtr>* location) {
+inline void replace_command(std::optional<CommandPtr> *location) {
   if (*location) {
     (*(*location))->cancel();
   }
@@ -108,32 +112,32 @@ inline void replace_command(std::optional<CommandPtr>* location) {
   location->reset();
 }
 
-Trigger& Trigger::on_true(std::nullopt_t) {
+Trigger &Trigger::on_true(std::nullopt_t) {
   replace_command(&m_on_true);
   return *this;
 }
 
-Trigger& Trigger::on_false(std::nullopt_t) {
+Trigger &Trigger::on_false(std::nullopt_t) {
   replace_command(&m_on_false);
   return *this;
 }
 
-Trigger& Trigger::on_change(std::nullopt_t) {
+Trigger &Trigger::on_change(std::nullopt_t) {
   replace_command(&m_on_change);
   return *this;
 }
 
-Trigger& Trigger::while_true(std::nullopt_t) {
+Trigger &Trigger::while_true(std::nullopt_t) {
   replace_command(&m_while_true);
   return *this;
 }
 
-Trigger& Trigger::while_false(std::nullopt_t) {
+Trigger &Trigger::while_false(std::nullopt_t) {
   replace_command(&m_while_false);
   return *this;
 }
 
-Trigger& Trigger::unbind_all() {
+Trigger &Trigger::unbind_all() {
   on_true(std::nullopt);
   on_false(std::nullopt);
   on_change(std::nullopt);
@@ -143,4 +147,4 @@ Trigger& Trigger::unbind_all() {
   return *this;
 }
 
-}  // namespace uvl
+} // namespace uvl
