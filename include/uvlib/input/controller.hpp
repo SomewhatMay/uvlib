@@ -18,8 +18,16 @@ class Scheduler;
  */
 class Controller : public Subsystem {
  public:
+  /**
+   * @note The user is responsible for disposing the pros::Controller that is
+   * passed to this constructor.
+   */
   explicit Controller(pros::Controller* controller);
 
+  /**
+   * @note The controller will be responsible for disposing the
+   * pros::Controller when necessary.
+   */
   explicit Controller(pros::controller_id_e_t id);
 
   Controller(const Controller&) = delete;
@@ -28,6 +36,9 @@ class Controller : public Subsystem {
   Controller(Controller&&) = delete;
   Controller& operator=(Controller&&) = delete;
 
+  /**
+   * Automatically unbinds all triggers.
+   */
   ~Controller();
 
   /**
@@ -39,6 +50,12 @@ class Controller : public Subsystem {
    * @return The controller's trigger.
    */
   Trigger& get_trigger(TriggerButton button);
+
+  /**
+   * Unbinds and destroys all the triggers attached to this controller. Any
+   * command that is currently scheduled will be cancelled.
+   */
+  void unbind_all_triggers();
 
   /**
    * A readonly reference to the left joystick of the VEX controller. Can be

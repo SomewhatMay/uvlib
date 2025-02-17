@@ -20,6 +20,8 @@ Controller::Controller(pros::controller_id_e_t id)
 }
 
 Controller::~Controller() {
+  unbind_all_triggers();
+
   if (controller_ownership) {
     delete controller;
   }
@@ -29,6 +31,11 @@ Trigger& Controller::get_trigger(TriggerButton button) {
   auto trigger = binded_triggers.try_emplace(button, controller, button);
 
   return trigger.first->second;
+}
+
+void Controller::unbind_all_triggers() {
+  // Unbinds all triggers and calls their destructors.
+  binded_triggers.clear();
 }
 
 void Controller::periodic() {

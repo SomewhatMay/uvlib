@@ -96,6 +96,11 @@ class Scheduler : public Singleton<Scheduler> {
   void cancel_command(Command *command);
 
   /**
+   * Immediately Cancels all commands currently scheduled by the scheduler.
+   */
+  void cancel_all_commands();
+
+  /**
    * Get a const reference to the commands currently scheduled by the scheduler.
    * Not every scheduled command is guaranteed to execute.
    *

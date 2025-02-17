@@ -15,6 +15,12 @@ class Trigger {
   explicit Trigger(pros::Controller*, TriggerButton button);
 
   /**
+   * All commands binded to this trigger are automatically unbinded and
+   * cancelled upon destruction.
+   */
+  ~Trigger();
+
+  /**
    * @note Triggers can not be moved or copied. You must retrieve the trigger
    * from the appropriate Controller using Controller::get_trigger();
    */
@@ -31,16 +37,33 @@ class Trigger {
    *
    * Ex. when the user presses the right trigger, schedule command to be
    * executed. Do nothing if the user continues to hold right trigger.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
    */
   Trigger& on_true(CommandPtr&& command);
+
+  /**
+   * Unbind the on_true trigger. Any related command that is scheduled by this
+   * specific trigger method will be cancelled.
+   */
+  Trigger& on_true(std::nullopt_t);
 
   /**
    * Same as Trigger::on_true, except schedules the command when the trigger's
    * state goes from true to false.
    *
    * @see Trigger:on_true();
+   * @returns The trigger that was called on. Enables method chaining.
    */
   Trigger& on_false(CommandPtr&& command);
+
+  /**
+   * Unbind the on_false trigger. Any related command that is scheduled by this
+   * specific trigger method will be cancelled.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
+   */
+  Trigger& on_false(std::nullopt_t);
 
   /**
    * Executed when the specified trigger's status turns from false to true or
@@ -52,8 +75,18 @@ class Trigger {
    *
    * @see Trigger:on_true();
    * @see Trigger:on_false();
+   *
+   * @returns The trigger that was called on. Enables method chaining.
    */
   Trigger& on_change(CommandPtr&& command);
+
+  /**
+   * Unbind the on_change trigger. Any related command that is scheduled by this
+   * specific trigger method will be cancelled.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
+   */
+  Trigger& on_change(std::nullopt_t);
 
   /**
    * Schedule command when the user initially presses the trigger. When the
@@ -62,15 +95,43 @@ class Trigger {
    *
    * Internally, this method calls Command::cancel() when the trigger
    * is released.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
    */
   Trigger& while_true(CommandPtr&& command);
+
+  /**
+   * Unbind the while_true trigger. Any related command that is scheduled by
+   * this specific trigger method will be cancelled.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
+   */
+  Trigger& while_true(std::nullopt_t);
 
   /**
    * Opposite behaviour to while_true()
    *
    * @see Trigger::while_true()
+   *
+   * @returns The trigger that was called on. Enables method chaining.
    */
   Trigger& while_false(CommandPtr&& command);
+
+  /**
+   * Unbind the while_false trigger. Any related command that is scheduled by
+   * this specific trigger method will be cancelled.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
+   */
+  Trigger& while_false(std::nullopt_t);
+
+  /**
+   * Unbinds all binded actions. Any related command that is scheduled by this
+   * specific trigger method will be cancelled.
+   *
+   * @returns The trigger that was called on. Enables method chaining.
+   */
+  Trigger& unbind_all();
 
   /**
    * Return a readonly reference to controller that this
