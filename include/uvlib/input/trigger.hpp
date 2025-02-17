@@ -11,8 +11,8 @@ namespace uvl {
  * Use this to directly bind Commands to controller behaviour/inputs.
  */
 class Trigger {
- public:
-  explicit Trigger(pros::Controller*, TriggerButton button);
+public:
+  explicit Trigger(pros::Controller *, TriggerButton button);
 
   /**
    * All commands binded to this trigger are automatically unbinded and
@@ -24,11 +24,11 @@ class Trigger {
    * @note Triggers can not be moved or copied. You must retrieve the trigger
    * from the appropriate Controller using Controller::get_trigger();
    */
-  Trigger(const Trigger&) = delete;
-  Trigger& operator=(const Trigger&) = delete;
+  Trigger(const Trigger &) = delete;
+  Trigger &operator=(const Trigger &) = delete;
 
-  Trigger(Trigger&&) = delete;
-  Trigger& operator=(Trigger&&) = delete;
+  Trigger(Trigger &&) = delete;
+  Trigger &operator=(Trigger &&) = delete;
 
   /* Trigger Methods */
 
@@ -40,13 +40,13 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& on_true(CommandPtr&& command);
+  Trigger &on_true(CommandPtr &&command);
 
   /**
    * Unbind the on_true trigger. Any related command that is scheduled by this
    * specific trigger method will be cancelled.
    */
-  Trigger& on_true(std::nullopt_t);
+  Trigger &on_true(std::nullopt_t);
 
   /**
    * Same as Trigger::on_true, except schedules the command when the trigger's
@@ -55,7 +55,7 @@ class Trigger {
    * @see Trigger:on_true();
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& on_false(CommandPtr&& command);
+  Trigger &on_false(CommandPtr &&command);
 
   /**
    * Unbind the on_false trigger. Any related command that is scheduled by this
@@ -63,7 +63,7 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& on_false(std::nullopt_t);
+  Trigger &on_false(std::nullopt_t);
 
   /**
    * Executed when the specified trigger's status turns from false to true or
@@ -73,12 +73,12 @@ class Trigger {
    * executed. Do nothing if the user continues to hold right trigger.
    * Reschedule command if the user lets go of the right trigger.
    *
-   * @see Trigger:on_true();
-   * @see Trigger:on_false();
+   * @see Trigger::on_true();
+   * @see Trigger::on_false();
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& on_change(CommandPtr&& command);
+  Trigger &on_change(CommandPtr &&command);
 
   /**
    * Unbind the on_change trigger. Any related command that is scheduled by this
@@ -86,7 +86,7 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& on_change(std::nullopt_t);
+  Trigger &on_change(std::nullopt_t);
 
   /**
    * Schedule command when the user initially presses the trigger. When the
@@ -98,7 +98,7 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& while_true(CommandPtr&& command);
+  Trigger &while_true(CommandPtr &&command);
 
   /**
    * Unbind the while_true trigger. Any related command that is scheduled by
@@ -106,16 +106,16 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& while_true(std::nullopt_t);
+  Trigger &while_true(std::nullopt_t);
 
   /**
    * Opposite behaviour to while_true()
    *
-   * @see Trigger::while_true()
+   * @see `Trigger::while_true()`
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& while_false(CommandPtr&& command);
+  Trigger &while_false(CommandPtr &&command);
 
   /**
    * Unbind the while_false trigger. Any related command that is scheduled by
@@ -123,7 +123,7 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& while_false(std::nullopt_t);
+  Trigger &while_false(std::nullopt_t);
 
   /**
    * Unbinds all binded actions. Any related command that is scheduled by this
@@ -131,18 +131,18 @@ class Trigger {
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
-  Trigger& unbind_all();
+  Trigger &unbind_all();
 
   /**
    * Return a readonly reference to controller that this
    * trigger is connected to.
    */
-  const pros::Controller& get_controller() const { return *controller; }
+  const pros::Controller &get_controller() const { return *controller; }
 
- private:
+private:
   friend class Controller;
 
-  pros::Controller* controller;
+  pros::Controller *controller;
 
   TriggerButton button;
 
@@ -160,4 +160,4 @@ class Trigger {
    */
   void execute();
 };
-}  // namespace uvl
+} // namespace uvl
