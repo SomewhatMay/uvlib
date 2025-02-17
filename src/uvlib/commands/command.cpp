@@ -7,6 +7,10 @@ Command::~Command() { cancel(); }
 
 void Command::cancel() { Scheduler::get_instance().cancel_command(this); }
 
+CommandPtr Command::and_then(CommandPtr&& next) && {
+  return std::move(*this).to_ptr().and_then(std::move(next));
+}
+
 void Command::on_end(bool interrupted) { end(interrupted); }
 
 void Command::initialize() {}
