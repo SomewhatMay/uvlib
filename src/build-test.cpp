@@ -17,7 +17,7 @@ int test_main() {
 
   master.get_trigger(uvl::TriggerButton::kA)
       .on_change(uvl::FunctionCommand([]() {}, []() {}, []() { return true; },
-                                      [](bool interrupted) {})
+                                      [](bool interrupted) {}, {})
                      .to_ptr());
 
   master.get_trigger(uvl::TriggerButton::kA)
