@@ -40,6 +40,20 @@ class Command {
   void cancel();
 
   /**
+   * Chains next with this command using the SequentialCommandGroup command.
+   * Next is guaranteed to schedule when and if this command finishes
+   * successfully.
+   *
+   * @note This invalidates the current command and converts it to a CommandPtr,
+   * identical to calling Command.to_ptr().and_then(next);
+   *
+   * @param next The command to schedule after this one.
+   *
+   * @return The SequentialCommandGroup CommandPtr.
+   */
+  virtual CommandPtr and_then(CommandPtr&& next) &&;
+
+  /**
    * Every command has a set of subsystem requirements. These subsystems must be
    * free for the command to execute. This ensures two commands do not try to
    * change the state of a singular subsystem at the same time, which may lead
@@ -70,6 +84,20 @@ class Command {
    * Doing so can cause undefined behaviour.
    */
   virtual bool is_finished();
+
+  /**
+   * Moves this command to a CommandPtr object and transfers ownership. This
+   * ensures that memory ownership is managed appropriately.
+   *
+   * @warning This method invalidates the current command through a move
+   * operation.
+   *
+   * @note This method is automatically overriden by the uvl::CommandHelper
+   * class and does not need any user configuration. It is recommended to
+   * inherit from the uvl::CommandHelper class when creating a custom command
+   * class.
+   */
+  virtual CommandPtr to_ptr() && = 0;
 
  protected:
   /**

@@ -35,6 +35,21 @@ class CommandPtr {
   Command* operator->();
 
   /**
+   * Chains next with this command using the SequentialCommandGroup command.
+   * Next is guaranteed to schedule when and if this command finishes
+   * successfully.
+   *
+   * @note Invalidates the current CommandPtr and moves all its contents to
+   * the returned CommandPtr as a SequentialCommandGroup.
+   *
+   * @param next The command to schedule after this one.
+   *
+   * @return The SequentialCommandGroup CommandPtr.
+   */
+  [[nodiscard]]
+  CommandPtr and_then(CommandPtr&& next) &&;
+
+  /**
    * Alias to CommandPtr::operator*()
    *
    * @return A pointer to the contained Command object.

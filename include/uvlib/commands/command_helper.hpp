@@ -21,8 +21,7 @@ class CommandHelper : public Base {
  public:
   CommandHelper() = default;
 
-  // Remove && and override since to_ptr() is not marked virtual in Base
-  CommandPtr to_ptr() {
+  CommandPtr to_ptr() && override {
     return CommandPtr(
         std::make_unique<CRTP>(std::move(*static_cast<CRTP*>(this))));
   }
