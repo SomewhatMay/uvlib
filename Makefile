@@ -29,7 +29,7 @@ IS_LIBRARY:=1
 # Be sure that your header files are in the include directory inside of a folder with the
 # same name as what you set LIBNAME to below.
 LIBNAME:=uvlib
-VERSION:=0.4.0
+VERSION:=0.4.1
 EXCLUDE_SRC_FROM_LIB= $(SRCDIR)/example.cpp
 EXCLUDE_SRC_FROM_LIB+= $(SRCDIR)/main.cpp
 EXCLUDE_SRC_FROM_LIB+= $(SRCDIR)/build-test.cpp
@@ -39,7 +39,7 @@ EXCLUDE_SRC_FROM_LIB+=$(foreach file, $(SRCDIR)/main,$(foreach cext,$(CEXTS),$(f
 # files that get distributed to every user (beyond your source archive) - add
 # whatever files you want here. This line is configured to add all header files
 # that are in the directory include/LIBNAME
-TEMPLATE_FILES=$(INCDIR)/$(LIBNAME)/*.h $(INCDIR)/$(LIBNAME)/*.hpp
+TEMPLATE_FILES=$(INCDIR)/$(LIBNAME)/*.h $(INCDIR)/$(LIBNAME)/*.hpp $(INCDIR)/$(LIBNAME)/commands/*.h $(INCDIR)/$(LIBNAME)/commands/*.hpp $(INCDIR)/$(LIBNAME)/input/*.h $(INCDIR)/$(LIBNAME)/input/*.hpp
 
 .DEFAULT_GOAL=quick
 
