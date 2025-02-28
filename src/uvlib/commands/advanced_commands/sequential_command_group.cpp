@@ -3,50 +3,68 @@
 #include "uvlib/scheduler.hpp"
 
 namespace uvl {
-void SequentialCommandGroup::schedule_next() {
-  if (!m_commands.empty()) {
-    Scheduler::get_instance().schedule_command(m_commands.front().get());
+SequentialCommandGroup::~SequentialCommandGroup() {
+  cancel_current();
+  m_commands.clear();
+}
+
+void SequentialCommandGroup::schedule_current() {
+  if (m_current_command != m_commands.end()) {
+    // If m_current_command does not point to the last command, schedule
+    // m_current_command
+    Scheduler::get_instance().schedule_command(m_current_command->get());
   }
 }
 
-void SequentialCommandGroup::cancel_all() {
-  for (auto& command : m_commands) {
-    if (command->is_alive()) {
-      command->cancel();
-    }
+void SequentialCommandGroup::cancel_current() {
+  if (m_current_command != m_commands.end() &&
+      m_current_command->get()->is_alive()) {
+    m_current_command->get()->cancel();
   }
 
-  m_commands.clear();
+  // Reset current command head
+  m_current_command = m_commands.begin();
 }
 
 void SequentialCommandGroup::initialize() {
   // This command just got scheduled. Let's schedule the first command
   // immediately
-  schedule_next();
+
+  m_failed = false;
+  m_current_command = m_commands.begin();
+  schedule_current();
 }
 
 void SequentialCommandGroup::execute() {
   // Check if the current command is dead
-  if (!m_commands.front()->is_alive()) {
-    if (m_commands.front()->is_finished()) {
+  if (!m_current_command->get()->is_alive()) {
+    if (m_current_command->get()->is_finished()) {
       // The command successfully returned true for is_finished, and therefore
       // executed without any interruption.
 
-      // FIXME ensure this calls the CommandPtr's destructor
-      m_commands.pop_front();
-
       // Continue by scheduling the next command in the list
-      schedule_next();
+      m_current_command++;
+      schedule_current();
     } else {
-      // Command unsuccessfully ended. We must cancel ourselves.
-      cancel_all();
+      // Command unsuccessfully ended. We must cancel all remaining commands.
+      cancel_current();
+      m_failed = true;
     }
   }
 }
 
-void SequentialCommandGroup::end(bool interrupted) {
-  cancel_all();
+void SequentialCommandGroup::end(bool interrupted) { cancel_current(); }
+
+bool SequentialCommandGroup::is_finished() {
+  return m_failed || m_current_command == m_commands.end();
 }
 
-bool SequentialCommandGroup::is_finished() { return m_commands.empty(); }
-}  // namespace uvl
+const std::list<CommandPtr> &SequentialCommandGroup::get_commands() const {
+  return m_commands;
+}
+
+const std::list<CommandPtr>::iterator &
+SequentialCommandGroup::get_current_command_iterator() const {
+  return m_current_command;
+}
+} // namespace uvl

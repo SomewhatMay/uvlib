@@ -17,20 +17,20 @@ class Command {
   friend class Scheduler;
   friend class Trigger;
 
- public:
+public:
   Command() = default;
 
-  ~Command();
+  virtual ~Command();
 
   /**
    * Commands cannot be copied around; they must
    * be moved.
    */
-  Command(const Command&) = delete;
-  Command& operator=(const Command& rhs) = delete;
+  Command(const Command &) = delete;
+  Command &operator=(const Command &rhs) = delete;
 
-  Command(Command&&) = default;
-  Command& operator=(Command&&) = default;
+  Command(Command &&) = default;
+  Command &operator=(Command &&) = default;
 
   /**
    * Cancels the command by setting it as not alive so it is not executed in
@@ -51,7 +51,7 @@ class Command {
    *
    * @return The SequentialCommandGroup CommandPtr.
    */
-  virtual CommandPtr and_then(CommandPtr&& next) &&;
+  virtual CommandPtr and_then(CommandPtr &&next) &&;
 
   /**
    * Every command has a set of subsystem requirements. These subsystems must be
@@ -59,7 +59,7 @@ class Command {
    * change the state of a singular subsystem at the same time, which may lead
    * to unexpected behaviour.
    */
-  const std::list<Subsystem*>& get_requirements() const;
+  const std::list<Subsystem *> &get_requirements() const;
 
   /**
    * Returns true if the command is currently alive, false otherwise.
@@ -67,7 +67,7 @@ class Command {
    * @note used internally to check whether the command is still in the
    * scheduler command list.
    */
-  const bool& is_alive() const;
+  const bool &is_alive() const;
 
   /**
    * Return true if and only if the command has achieved its goal.
@@ -99,14 +99,14 @@ class Command {
    */
   virtual CommandPtr to_ptr() && = 0;
 
- protected:
+protected:
   /**
    * Appends to the list of subsystem requirements.
    *
    * To learn more,
    * @see uvl::Command::get_requirements()
    */
-  void add_requirements(std::initializer_list<Subsystem*>);
+  void add_requirements(std::initializer_list<Subsystem *>);
 
   /**
    * Implement any initialization logic here. Since commands are reusable and
@@ -143,7 +143,7 @@ class Command {
    */
   ScheduleDirection m_schedule_direction = ScheduleDirection::kTop;
 
- private:
+private:
   /**
    * The method called by the scheduler when a command is ended. This handles
    * internal actions that must happen when the command comes to an end, and
@@ -154,7 +154,7 @@ class Command {
    */
   void on_end(bool interrupted);
 
-  std::list<Subsystem*> m_requirements;
+  std::list<Subsystem *> m_requirements;
 
   /**
    * The last tick at which the command was executed in.
@@ -178,4 +178,4 @@ class Command {
    */
   bool m_is_alive = false;
 };
-}  // namespace uvl
+} // namespace uvl
