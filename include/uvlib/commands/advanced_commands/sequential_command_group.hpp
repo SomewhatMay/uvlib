@@ -24,19 +24,6 @@ public:
    * @param commands The list of commands to be executed in order. The first
    * command is instantly scheduled when this command group is scheduled.
    */
-  // template <typename... Args> SequentialCommandGroup(Args &&...args) {
-  //   static_assert(
-  //       (std::is_same_v<std::remove_reference_t<Args>, CommandPtr> && ...),
-  //       "All arguments must be of type CommandPtr");
-
-  //   if constexpr (sizeof...(Args) == 0) {
-  //     throw std::invalid_argument(
-  //         "At least one command must be provided to SequentialCommandGroup");
-  //   }
-
-  //   // Move each argument into the vector
-  //   (m_commands.push_back(std::forward<Args>(args)), ...);
-  // }
 
   template <typename... Args> SequentialCommandGroup(Args &&...args) {
     static_assert(
@@ -46,6 +33,9 @@ public:
     // Move each argument into the vector
     (m_commands.push_front(std::forward<Args>(args)), ...);
   }
+
+  SequentialCommandGroup(SequentialCommandGroup &&) = default;
+  SequentialCommandGroup &operator=(SequentialCommandGroup &&) = default;
 
   ~SequentialCommandGroup() override;
 

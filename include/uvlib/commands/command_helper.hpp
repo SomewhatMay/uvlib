@@ -20,6 +20,11 @@ template <typename Base, typename CRTP> class CommandHelper : public Base {
 public:
   CommandHelper() = default;
 
+  virtual ~CommandHelper() = default;
+
+  CommandHelper(CommandHelper &&) = default;
+  CommandHelper &operator=(CommandHelper &&) = default;
+
   CommandPtr to_ptr() && override {
     return CommandPtr(
         std::make_unique<CRTP>(std::move(*static_cast<CRTP *>(this))));
