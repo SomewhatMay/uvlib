@@ -24,15 +24,15 @@ int test_main() {
                                       [](bool interrupted) {}, {})
                      .to_ptr());
 
-  master.get_trigger(uvl::TriggerButton::kB)
-      .on_true(uvl::SequentialCommandGroup(
-                   uvl::InstantCommand(
-                       []() { std::cout << "First command executed\n"; }, {})
-                       .to_ptr(),
-                   uvl::InstantCommand(
-                       []() { std::cout << "Second command executed\n"; }, {})
-                       .to_ptr())
-                   .to_ptr());
+  //   master.get_trigger(uvl::TriggerButton::kB)
+  //       .on_true(uvl::SequentialCommandGroup(
+  //                    uvl::InstantCommand(
+  //                        []() { std::cout << "First command executed\n"; },
+  //                        {}) .to_ptr(),
+  //                    uvl::InstantCommand(
+  //                        []() { std::cout << "Second command executed\n"; },
+  //                        {}) .to_ptr())
+  //                    .to_ptr());
 
   master.get_trigger(uvl::TriggerButton::kX)
       .on_true(
