@@ -35,12 +35,16 @@ class SequentialCommandGroup
     (m_commands.push_front(std::forward<Args>(args)), ...);
   }
 
+  void cancel_all();
+
  protected:
   void initialize() override;
 
   void execute() override;
 
   bool is_finished() override;
+
+  void end(bool interrupted) override;
 
  private:
   std::forward_list<CommandPtr> m_commands;

@@ -9,6 +9,16 @@ void SequentialCommandGroup::schedule_next() {
   }
 }
 
+void SequentialCommandGroup::cancel_all() {
+  for (auto& command : m_commands) {
+    if (command->is_alive()) {
+      command->cancel();
+    }
+  }
+
+  m_commands.clear();
+}
+
 void SequentialCommandGroup::initialize() {
   // This command just got scheduled. Let's schedule the first command
   // immediately
@@ -29,9 +39,13 @@ void SequentialCommandGroup::execute() {
       schedule_next();
     } else {
       // Command unsuccessfully ended. We must cancel ourselves.
-      cancel();
+      cancel_all();
     }
   }
+}
+
+void SequentialCommandGroup::end(bool interrupted) {
+  cancel_all();
 }
 
 bool SequentialCommandGroup::is_finished() { return m_commands.empty(); }
