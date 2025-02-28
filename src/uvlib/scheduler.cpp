@@ -74,7 +74,7 @@ bool Scheduler::schedule_command(CommandPtr &&command) {
   Command *raw_ptr = command.get();
   if (schedule_command(raw_ptr)) {
     // Only accept ownership if the command was successfully scheduled
-    m_owned_commands.insert({raw_ptr, std::move(command)});
+    m_owned_commands.insert(std::make_pair(raw_ptr, std::move(command)));
 
     return true;
   }
@@ -99,7 +99,11 @@ void Scheduler::cancel_command(Command *command) {
 
     free_requirements(command);
 
-    m_scheduled_commands.remove(command);
+    auto found = std::find(m_scheduled_commands.begin(), m_scheduled_commands.end(), command);
+    if (found != m_scheduled_commands.end()) {
+      m_scheduled_commands.erase(found);
+    }
+
     command->on_end(true);
   }
 
@@ -241,4 +245,10 @@ const std::unordered_map<Command *, CommandPtr> &Scheduler::get_owned_commands()
 const std::list<Subsystem *> &Scheduler::get_subsystems() {
   return m_registered_subsystems;
 }
+
+const std::unordered_map<Subsystem *, Command *> &Scheduler::get_active_subsystems()
+    const {
+  return m_active_subsystems;
+}
+
 }  // namespace uvl
