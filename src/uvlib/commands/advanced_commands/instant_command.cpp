@@ -3,7 +3,7 @@
 namespace uvl {
 
 InstantCommand::InstantCommand(std::function<void()> callback,
-                               std::initializer_list<Subsystem*> requirements)
+                               std::initializer_list<Subsystem *> requirements)
     : m_callback(callback) {
   add_requirements(requirements);
 }
@@ -17,5 +17,5 @@ void InstantCommand::execute() {
 
 bool InstantCommand::is_finished() { return m_has_executed; }
 
-void InstantCommand::end(bool interrupted) {}
-}  // namespace uvl
+void InstantCommand::end(bool interrupted) { m_has_executed = false; }
+} // namespace uvl
