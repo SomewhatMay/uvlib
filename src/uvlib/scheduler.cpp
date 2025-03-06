@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include "enums.hpp"
 #include "main.h"
 #include "uvlib/commands/command.hpp"
 #include "uvlib/commands/commandptr.hpp"
@@ -65,6 +66,7 @@ bool Scheduler::schedule_command(Command *command) {
   }
 
   command->m_is_alive = true;
+  command->m_state = CommandState::kRunning;
   command->initialize();
 
   return true;
@@ -96,10 +98,12 @@ void Scheduler::dealloc_owned_command(Command *command) {
 void Scheduler::cancel_command(Command *command) {
   if (command->m_is_alive) {
     command->m_is_alive = false;
+    command->m_state = CommandState::kInterrupted;
 
     free_requirements(command);
 
-    auto found = std::find(m_scheduled_commands.begin(), m_scheduled_commands.end(), command);
+    auto found = std::find(m_scheduled_commands.begin(),
+                           m_scheduled_commands.end(), command);
     if (found != m_scheduled_commands.end()) {
       m_scheduled_commands.erase(found);
     }
@@ -132,6 +136,7 @@ void Scheduler::run() {
         // for is_finished, and therefore executed without
         // any interruption.
         target->m_is_alive = false;
+        target->m_state = CommandState::kSuccess;
         free_requirements(target);
         dealloc_owned_command(target);
         target->on_end(false);
@@ -186,7 +191,8 @@ void Scheduler::run() {
           is_runnable_command =
               is_runnable_command && !m_active_subsystems.contains(requirement);
 
-          if (!is_runnable_command) break;
+          if (!is_runnable_command)
+            break;
         }
 
         if (!default_command->is_finished() && is_runnable_command &&
@@ -194,6 +200,7 @@ void Scheduler::run() {
           if (!default_command->m_is_alive) {
             // Command has just reawakened from being dead in the previous tick
             default_command->initialize();
+            default_command->m_state = CommandState::kRunning;
           }
 
           default_command->m_tick_number = tick_number;
@@ -206,6 +213,7 @@ void Scheduler::run() {
         // The default command was alive the previous tick but has been
         // interrupted. We need to call on_end() to properly clean up.
         default_command->m_is_alive = false;
+        default_command->m_state = CommandState::kInterrupted;
         default_command->on_end(true);
         // No need to free the requirements because default commands never
         // add their requirements to the m_active_subsystems map. This is
@@ -237,8 +245,8 @@ const std::list<Command *> &Scheduler::get_scheduled_commands() const {
   return m_scheduled_commands;
 }
 
-const std::unordered_map<Command *, CommandPtr> &Scheduler::get_owned_commands()
-    const {
+const std::unordered_map<Command *, CommandPtr> &
+Scheduler::get_owned_commands() const {
   return m_owned_commands;
 }
 
@@ -246,9 +254,9 @@ const std::list<Subsystem *> &Scheduler::get_subsystems() {
   return m_registered_subsystems;
 }
 
-const std::unordered_map<Subsystem *, Command *> &Scheduler::get_active_subsystems()
-    const {
+const std::unordered_map<Subsystem *, Command *> &
+Scheduler::get_active_subsystems() const {
   return m_active_subsystems;
 }
 
-}  // namespace uvl
+} // namespace uvl

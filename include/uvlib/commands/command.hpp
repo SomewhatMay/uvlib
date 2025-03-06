@@ -69,6 +69,8 @@ public:
    */
   const bool &is_alive() const;
 
+  CommandState get_state() const;
+
   /**
    * Return true if and only if the command has achieved its goal.
    *
@@ -177,5 +179,10 @@ private:
    * tick.
    */
   bool m_is_alive = false;
+
+  /**
+   * The current state of the command as determined by the scheduler.
+   */
+  CommandState m_state = CommandState::kUninitialized;
 };
 } // namespace uvl

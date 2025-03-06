@@ -37,8 +37,8 @@ void SequentialCommandGroup::initialize() {
 
 void SequentialCommandGroup::execute() {
   // Check if the current command is dead
-  if (!m_current_command->get()->is_alive()) {
-    if (m_current_command->get()->is_finished()) {
+  if (m_current_command->get()->get_state() != CommandState::kRunning) {
+    if (m_current_command->get()->get_state() == CommandState::kSuccess) {
       // The command successfully returned true for is_finished, and therefore
       // executed without any interruption.
 
