@@ -10,7 +10,7 @@ namespace uvl {
  * stack.
  */
 enum struct ScheduleDirection {
-  kTop,  // Default
+  kTop, // Default
   kBottom
 };
 
@@ -36,4 +36,6 @@ enum struct TriggerButton {
  * The two analog sticks in a standard VEX controller.
  */
 enum struct AnalogStick { kLeft, kRight };
-}  // namespace uvl
+
+enum struct CommandState { kUninitialized, kRunning, kInterrupted, kSuccess };
+} // namespace uvl
