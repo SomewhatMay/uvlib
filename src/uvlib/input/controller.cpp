@@ -48,9 +48,5 @@ void Controller::unbind_all_triggers() {
   binded_triggers.clear();
 }
 
-void Controller::periodic() {
-  for (auto &[button, trigger] : binded_triggers) {
-    trigger.execute();
-  }
-}
+void Controller::periodic() {}
 } // namespace uvl

@@ -15,11 +15,20 @@ constexpr pros::controller_digital_e_t to_pros_digital(TriggerButton button) {
 Trigger::Trigger(pros::Controller *controller, TriggerButton button)
     : m_condition_callback([controller, button]() {
         return controller->get_digital(to_pros_digital(button));
-      }) {}
+      }) {
+  register_self();
+}
 
-Trigger::Trigger(std::function<bool()> condition_callback) {}
+Trigger::Trigger(std::function<bool()> condition_callback) { register_self(); }
 
-Trigger::~Trigger() { unbind_all(); }
+Trigger::~Trigger() {
+  unbind_all();
+  Scheduler::get_instance().unregister_trigger(this);
+}
+
+void Trigger::register_self() {
+  Scheduler::get_instance().register_trigger(this);
+}
 
 /* Execute */
 

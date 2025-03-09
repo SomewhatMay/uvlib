@@ -174,8 +174,11 @@ private:
    * @note This method should be called by the trigger itself when it is
    * destroyed, so that the scheduler does not attempt to execute a non
    * existent trigger.
+   *
+   * @warning This method should only be called automatically by the trigger
+   * within its destructor.
    */
-  void unregister_trigger(Trigger trigger);
+  void unregister_trigger(Trigger *trigger);
 
   /**
    * Runs an iteration ("a tick") of the scheduler, executing all scheduled

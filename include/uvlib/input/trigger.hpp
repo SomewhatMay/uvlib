@@ -49,8 +49,8 @@ public:
   /**
    * Executed when the specified trigger's status turns from false to true.
    *
-   * Ex. when the user presses the right trigger, schedule command to be
-   * executed. Do nothing if the user continues to hold right trigger.
+   * Ex. when the user presses the a button, schedule command to be
+   * executed. Do nothing if the user continues to hold the same button.
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
@@ -83,9 +83,9 @@ public:
    * Executed when the specified trigger's status turns from false to true or
    * vice versa.
    *
-   * Ex. when the user presses the right trigger, schedule command to be
-   * executed. Do nothing if the user continues to hold right trigger.
-   * Reschedule command if the user lets go of the right trigger.
+   * Ex. when the user presses a button, schedule command to be
+   * executed. Do nothing if the user continues to hold the same button.
+   * Reschedule command if the user lets go of the button.
    *
    * @see Trigger::on_true();
    * @see Trigger::on_false();
@@ -149,6 +149,7 @@ public:
 
 private:
   friend class Controller;
+  friend class Scheduler;
 
   // pros::Controller *controller;
 
@@ -169,5 +170,11 @@ private:
    * every tick.
    */
   void execute();
+
+  /**
+   * Register this trigger with the scheduler. Automatically called by the
+   * Controller once for each trigger.
+   */
+  void register_self();
 };
 } // namespace uvl
