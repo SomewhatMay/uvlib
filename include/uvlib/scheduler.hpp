@@ -18,7 +18,7 @@ namespace uvl {
  * Scheduler::get_instance() method instead.
  */
 class Scheduler : public Singleton<Scheduler> {
- public:
+public:
   /**
    * To get a reference to the active scheduler in the current environment, use
    * the following command:
@@ -129,15 +129,17 @@ class Scheduler : public Singleton<Scheduler> {
    * @return Get a const reference to the subsystems that are being used by the
    * scheduled commands.
    */
-  const std::unordered_map<Subsystem *, Command *> &get_active_subsystems()
-      const;
+  const std::unordered_map<Subsystem *, Command *> &
+  get_active_subsystems() const;
 
- private:
+private:
   friend class Singleton;
   friend class Subsystem;
+  friend class Trigger;
 
   Scheduler() = default;
 
+  std::list<Trigger *> m_scheduled_triggers;
   std::list<Command *> m_scheduled_commands;
   std::list<Subsystem *> m_registered_subsystems;
 
@@ -156,6 +158,27 @@ class Scheduler : public Singleton<Scheduler> {
    * Internal method only: to be used by the subsystem superclass automatically.
    */
   void register_subsystem(Subsystem *subsystem);
+
+  /**
+   * Registers a new trigger to be executed by the scheduler every tick.
+   *
+   * @note Since the trigger is a pointer, it must be kept alive by the user.
+   * The trigger should automatically call unregister when it is destroyed.
+   */
+  void register_trigger(Trigger *trigger);
+
+  /**
+   * Unregisters a trigger from the scheduler, preventing it from being executed
+   * by the scheduler every tick.
+   *
+   * @note This method should be called by the trigger itself when it is
+   * destroyed, so that the scheduler does not attempt to execute a non
+   * existent trigger.
+   *
+   * @warning This method should only be called automatically by the trigger
+   * within its destructor.
+   */
+  void unregister_trigger(Trigger *trigger);
 
   /**
    * Runs an iteration ("a tick") of the scheduler, executing all scheduled
@@ -177,4 +200,4 @@ class Scheduler : public Singleton<Scheduler> {
    */
   void dealloc_owned_command(Command *command);
 };
-}  // namespace uvl
+} // namespace uvl

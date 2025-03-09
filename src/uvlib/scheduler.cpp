@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include "enums.hpp"
+#include "input/trigger.hpp"
 #include "main.h"
 #include "uvlib/commands/command.hpp"
 #include "uvlib/commands/commandptr.hpp"
@@ -124,7 +125,24 @@ void Scheduler::cancel_all_commands() {
   }
 }
 
+void Scheduler::register_trigger(Trigger *trigger) {
+  m_scheduled_triggers.push_back(trigger);
+}
+
+void Scheduler::unregister_trigger(Trigger *trigger) {
+  auto found = std::find(m_scheduled_triggers.begin(),
+                         m_scheduled_triggers.end(), trigger);
+  if (found != m_scheduled_triggers.end()) {
+    m_scheduled_triggers.erase(found);
+  }
+}
+
 void Scheduler::run() {
+  /* Execute all triggers */
+  for (auto trigger : m_scheduled_triggers) {
+    trigger->execute();
+  }
+
   /* Execute all commands */
   for (auto command_it = m_scheduled_commands.begin();
        command_it != m_scheduled_commands.end();) {

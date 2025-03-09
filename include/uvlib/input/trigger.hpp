@@ -3,6 +3,7 @@
 #include "main.h"
 #include "uvlib/commands/commandptr.hpp"
 #include "uvlib/typedefs.hpp"
+#include <functional>
 
 namespace uvl {
 /**
@@ -13,6 +14,8 @@ namespace uvl {
 class Trigger {
 public:
   explicit Trigger(pros::Controller *, TriggerButton button);
+
+  explicit Trigger(std::function<bool()> condition);
 
   /**
    * All commands binded to this trigger are automatically unbinded and
@@ -31,9 +34,10 @@ public:
   Trigger &operator=(Trigger &&) = delete;
 
   /**
-   * @brief Return true if and only if the trigger is currently being held down.
+   * @brief Return true if and only if the condition is true.
    *
-   * Analogous to the pros::Controller::get_digital(<TriggerButton>);
+   * When attached to a controller, analogous to the command
+   * pros::Controller::get_digital(<TriggerButton>);
    *
    * @return true
    * @return false
@@ -45,8 +49,8 @@ public:
   /**
    * Executed when the specified trigger's status turns from false to true.
    *
-   * Ex. when the user presses the right trigger, schedule command to be
-   * executed. Do nothing if the user continues to hold right trigger.
+   * Ex. when the user presses the a button, schedule command to be
+   * executed. Do nothing if the user continues to hold the same button.
    *
    * @returns The trigger that was called on. Enables method chaining.
    */
@@ -79,9 +83,9 @@ public:
    * Executed when the specified trigger's status turns from false to true or
    * vice versa.
    *
-   * Ex. when the user presses the right trigger, schedule command to be
-   * executed. Do nothing if the user continues to hold right trigger.
-   * Reschedule command if the user lets go of the right trigger.
+   * Ex. when the user presses a button, schedule command to be
+   * executed. Do nothing if the user continues to hold the same button.
+   * Reschedule command if the user lets go of the button.
    *
    * @see Trigger::on_true();
    * @see Trigger::on_false();
@@ -143,18 +147,15 @@ public:
    */
   Trigger &unbind_all();
 
-  /**
-   * Return a readonly reference to controller that this
-   * trigger is connected to.
-   */
-  const pros::Controller &get_controller() const { return *controller; }
-
 private:
   friend class Controller;
+  friend class Scheduler;
 
-  pros::Controller *controller;
+  // pros::Controller *controller;
 
-  TriggerButton button;
+  // TriggerButton button;
+
+  std::function<bool()> m_condition_callback;
 
   bool previous_state = false;
 
@@ -169,5 +170,11 @@ private:
    * every tick.
    */
   void execute();
+
+  /**
+   * Register this trigger with the scheduler. Automatically called by the
+   * Controller once for each trigger.
+   */
+  void register_self();
 };
 } // namespace uvl
