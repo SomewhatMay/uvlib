@@ -9,7 +9,7 @@
 #include "main.h"
 #include "uvlib/command_api.hpp"
 #include "uvlib/commands/advanced_commands/instant_command.hpp"
-#include "uvlib/commands/advanced_commands/uninitialized_command.hpp"
+#include "uvlib/commands/advanced_commands/run_until_command.hpp"
 #include "uvlib/commands/advanced_commands/wait_command.hpp"
 #include "uvlib/commands/advanced_commands/wait_until_command.hpp"
 #include "uvlib/enums.hpp"
@@ -68,8 +68,13 @@ int test_main() {
 
   uvl::Trigger customTrigger([]() { return sin(pros::millis() / 1000.0) > 0; });
   customTrigger.on_true(
-      uvl::UninitializedCommand([]() {}, []() { return true; }, [](bool) {}, {})
+      uvl::RunUntilCommand([]() {}, []() { return true; }, [](bool) {}, {})
           .to_ptr());
+
+  uvl::Trigger customTrigger2(
+      []() { return cos(pros::millis() / 1000.0) > 0; });
+  customTrigger.while_true(
+      uvl::RunUntilCommand([]() {}, []() { return true; }, {}).to_ptr());
 
   return 0;
 }
