@@ -3,6 +3,7 @@
 #include "main.h"
 #include "uvlib/commands/commandptr.hpp"
 #include "uvlib/typedefs.hpp"
+#include <functional>
 
 namespace uvl {
 /**
@@ -13,6 +14,8 @@ namespace uvl {
 class Trigger {
 public:
   explicit Trigger(pros::Controller *, TriggerButton button);
+
+  explicit Trigger(std::function<bool()> condition);
 
   /**
    * All commands binded to this trigger are automatically unbinded and
@@ -31,9 +34,10 @@ public:
   Trigger &operator=(Trigger &&) = delete;
 
   /**
-   * @brief Return true if and only if the trigger is currently being held down.
+   * @brief Return true if and only if the condition is true.
    *
-   * Analogous to the pros::Controller::get_digital(<TriggerButton>);
+   * When attached to a controller, analogous to the command
+   * pros::Controller::get_digital(<TriggerButton>);
    *
    * @return true
    * @return false
@@ -143,18 +147,14 @@ public:
    */
   Trigger &unbind_all();
 
-  /**
-   * Return a readonly reference to controller that this
-   * trigger is connected to.
-   */
-  const pros::Controller &get_controller() const { return *controller; }
-
 private:
   friend class Controller;
 
-  pros::Controller *controller;
+  // pros::Controller *controller;
 
-  TriggerButton button;
+  // TriggerButton button;
+
+  std::function<bool()> m_condition_callback;
 
   bool previous_state = false;
 
