@@ -6,7 +6,7 @@
 
 namespace uvl {
 WaitUntilCommand::WaitUntilCommand(
-    std::function<bool()> condition, double duration,
+    std::function<bool()> condition, uint32_t duration,
     std::initializer_list<Subsystem *> requirements)
     : m_condition(std::move(condition)),
       m_timeout_end(pros::millis() + duration) {

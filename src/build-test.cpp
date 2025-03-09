@@ -8,6 +8,7 @@
 
 #include "main.h"
 #include "uvlib/command_api.hpp"
+#include "uvlib/commands/advanced_commands/conditional_command.hpp"
 #include "uvlib/commands/advanced_commands/instant_command.hpp"
 #include "uvlib/commands/advanced_commands/run_until_command.hpp"
 #include "uvlib/commands/advanced_commands/wait_command.hpp"
@@ -66,15 +67,21 @@ int test_main() {
                             []() { std::cout << "Joystick moved!\n"; }, {})
                             .to_ptr()));
 
-  uvl::Trigger customTrigger([]() { return sin(pros::millis() / 1000.0) > 0; });
-  customTrigger.on_true(
+  uvl::Trigger custom_trigger(
+      []() { return sin(pros::millis() / 1000.0) > 0; });
+  custom_trigger.on_true(
       uvl::RunUntilCommand([]() {}, []() { return true; }, [](bool) {}, {})
           .to_ptr());
 
-  uvl::Trigger customTrigger2(
-      []() { return cos(pros::millis() / 1000.0) > 0; });
-  customTrigger.while_true(
+  custom_trigger.on_false(
       uvl::RunUntilCommand([]() {}, []() { return true; }, {}).to_ptr());
+
+  custom_trigger.on_change(
+      uvl::ConditionalCommand(
+          []() { return true; },
+          uvl::InstantCommand([]() { std::cout << "True\n"; }, {}).to_ptr(),
+          uvl::InstantCommand([]() { std::cout << "False\n"; }, {}).to_ptr())
+          .to_ptr());
 
   return 0;
 }
