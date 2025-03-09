@@ -4,9 +4,12 @@
 #include <concepts>
 #include <list>
 #include <memory>
+#include <optional>
 #include <stack>
 #include <unordered_map>
 
+#include "input/controller.hpp"
+#include "pros/misc.hpp"
 #include "uvlib/commands/commandptr.hpp"
 #include "uvlib/singleton.hpp"
 #include "uvlib/typedefs.hpp"
@@ -101,6 +104,25 @@ public:
   void cancel_all_commands();
 
   /**
+   * @brief Forwards the debug information (such as the scheduler's execution
+   * time) to the controller.
+   *
+   * @note the debugging information sent to the controller is very infrequent
+   * due to VexOS's limitations.
+   *
+   * @param controller
+   */
+  void forward_debug(Controller *controller);
+
+  /**
+   * @brief Analogous to uvl::Scheduler::forward_debug(Controller controller),
+   * just with a pros::Controller.
+   *
+   * @param controller
+   */
+  void forward_debug(pros::Controller *controller);
+
+  /**
    * Get a const reference to the commands currently scheduled by the scheduler.
    * Not every scheduled command is guaranteed to execute.
    *
@@ -132,6 +154,14 @@ public:
   const std::unordered_map<Subsystem *, Command *> &
   get_active_subsystems() const;
 
+  void set_tick_delay(uint32_t delay);
+
+  uint32_t get_tick_delay() const;
+
+  bool in_mainloop() const;
+
+  void set_debugging(bool enabled);
+
 private:
   friend class Singleton;
   friend class Subsystem;
@@ -142,6 +172,27 @@ private:
   std::list<Trigger *> m_scheduled_triggers;
   std::list<Command *> m_scheduled_commands;
   std::list<Subsystem *> m_registered_subsystems;
+
+  std::optional<pros::Controller *> m_debug_controller;
+
+  /**
+   * @brief True if and only if the mainloop is currently running.
+   */
+  bool m_in_mainloop = false;
+
+  /**
+   * @brief The duration in milliseconds to wait between ticks
+   */
+  uint32_t m_tick_delay = 20;
+
+  /**
+   * @brief The amount of time it took the most recent tick to execute.
+   *
+   * @note This is generally a great way to check how slow your code is running.
+   */
+  int m_execution_delta = 0;
+
+  bool m_debugging_enabled = false;
 
   /**
    * Represents the subsystems that are being used by the scheduled commands.

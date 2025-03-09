@@ -1,6 +1,10 @@
 #include "uvlib/scheduler.hpp"
 
+#include "commands/advanced_commands/run_until_command.hpp"
+#include "main.h"
+#include <cstdint>
 #include <stdexcept>
+#include <sys/types.h>
 #include <unordered_set>
 
 #include "enums.hpp"
@@ -251,15 +255,51 @@ void Scheduler::run() {
 }
 
 void Scheduler::mainloop() {
+  if (m_in_mainloop) {
+    return;
+  }
+
+  m_in_mainloop = true;
+
   uint32_t now = pros::millis();
+
+  // The pros wiki recommends we only send data every 50ms at maximum when
+  // connected via VexNet.
+  const uint32_t CONTROLLER_OUTPUT_DELAY = 60; // in ms
+  uint32_t prev_controller_output = 0;
+
   while (true) {
     run();
-    pros::c::task_delay_until(&now, 20);
+    pros::c::task_delay_until(&now, m_tick_delay);
+
+    if (m_debugging_enabled) {
+      m_execution_delta = pros::millis() - now - m_tick_delay;
+      std::string output_text =
+          "Scheduler: " + std::to_string(tick_number) + " ticks - " +
+          std::to_string(m_execution_delta) + " ms " +
+          (m_execution_delta > m_tick_delay ? "(OVERRUN)" : "(stable)");
+
+      pros::lcd::set_text(0, output_text);
+      if (pros::millis() - prev_controller_output > CONTROLLER_OUTPUT_DELAY) {
+        prev_controller_output = pros::millis();
+        if (m_debug_controller && m_debug_controller.value()->is_connected()) {
+          m_debug_controller.value()->set_text(0, 0, output_text);
+        }
+      }
+    }
 
     // FIXME watch to ensure no issues arise
     // when this variable overflows.
     tick_number++;
   }
+}
+
+void Scheduler::forward_debug(pros::Controller *controller) {
+  m_debug_controller = controller;
+}
+
+void Scheduler::forward_debug(Controller *controller) {
+  forward_debug(controller->controller);
 }
 
 /* Getters */
@@ -281,5 +321,13 @@ const std::unordered_map<Subsystem *, Command *> &
 Scheduler::get_active_subsystems() const {
   return m_active_subsystems;
 }
+
+void Scheduler::set_tick_delay(uint32_t delay) { m_tick_delay = delay; }
+
+uint32_t Scheduler::get_tick_delay() const { return m_tick_delay; }
+
+bool Scheduler::in_mainloop() const { return m_in_mainloop; }
+
+void Scheduler::set_debugging(bool enabled) { m_debugging_enabled = enabled; }
 
 } // namespace uvl
