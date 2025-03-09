@@ -2,12 +2,14 @@
  * Test any templated functions/classes to ensure they properly compile.
  */
 
+#include <cmath>
 #include <iostream>
 #include <optional>
 
 #include "main.h"
 #include "uvlib/command_api.hpp"
 #include "uvlib/commands/advanced_commands/instant_command.hpp"
+#include "uvlib/commands/advanced_commands/uninitialized_command.hpp"
 #include "uvlib/commands/advanced_commands/wait_command.hpp"
 #include "uvlib/commands/advanced_commands/wait_until_command.hpp"
 #include "uvlib/enums.hpp"
@@ -63,6 +65,11 @@ int test_main() {
               .and_then(uvl::InstantCommand(
                             []() { std::cout << "Joystick moved!\n"; }, {})
                             .to_ptr()));
+
+  uvl::Trigger customTrigger([]() { return sin(pros::millis() / 1000.0) > 0; });
+  customTrigger.on_true(
+      uvl::UninitializedCommand([]() {}, []() { return true; }, [](bool) {}, {})
+          .to_ptr());
 
   return 0;
 }
