@@ -18,7 +18,7 @@ void SequentialCommandGroup::schedule_current() {
 
 void SequentialCommandGroup::cancel_current() {
   if (m_current_command != m_commands.end() &&
-      m_current_command->get()->is_alive()) {
+      m_current_command->get()->get_state() == CommandState::kRunning) {
     m_current_command->get()->cancel();
   }
 

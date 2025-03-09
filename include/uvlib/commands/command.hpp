@@ -64,11 +64,26 @@ public:
   /**
    * Returns true if the command is currently alive, false otherwise.
    *
+   * @note It is recommended to use Command::get_state to determine the
+   * command's current state, as it provides more detailed information. This
+   * property only exists to aid the scheduler's work.
+   *
    * @note used internally to check whether the command is still in the
    * scheduler command list.
    */
   const bool &is_alive() const;
 
+  /**
+   * @brief The current state of the Command, set by the scheduler.
+   *
+   * @return CommandState:
+   * - kUninitialized: The command has not been initialized yet.
+   * - kRunning: The command is currently running and is scheduled.
+   * - kSuccess: The command has successfully completed (returned true from
+   * is_finished).
+   * - kInterrupted: The command was interrupted (due to being cancelled or
+   * another command's requirements).
+   */
   CommandState get_state() const;
 
   /**

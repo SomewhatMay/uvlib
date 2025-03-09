@@ -198,6 +198,7 @@ void Scheduler::run() {
 
       // True if the default command has successfully executed this tick.
       bool executed = false;
+      bool is_finished = false;
 
       if (!m_active_subsystems.contains(subsystem)) {
         // Ensure the command has not already been executed
@@ -213,12 +214,15 @@ void Scheduler::run() {
             break;
         }
 
-        if (!default_command->is_finished() && is_runnable_command &&
+        is_finished = default_command->is_finished();
+
+        if (!is_finished && is_runnable_command &&
             default_command->m_tick_number != tick_number) {
           if (!default_command->m_is_alive) {
             // Command has just reawakened from being dead in the previous tick
-            default_command->initialize();
+            default_command->m_is_alive = true;
             default_command->m_state = CommandState::kRunning;
+            default_command->initialize();
           }
 
           default_command->m_tick_number = tick_number;
@@ -231,7 +235,8 @@ void Scheduler::run() {
         // The default command was alive the previous tick but has been
         // interrupted. We need to call on_end() to properly clean up.
         default_command->m_is_alive = false;
-        default_command->m_state = CommandState::kInterrupted;
+        default_command->m_state =
+            is_finished ? CommandState::kSuccess : CommandState::kInterrupted;
         default_command->on_end(true);
         // No need to free the requirements because default commands never
         // add their requirements to the m_active_subsystems map. This is
